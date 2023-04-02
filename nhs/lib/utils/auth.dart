@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Authentication {
@@ -19,18 +20,31 @@ class Authentication {
     ));
   }
 
-  static Future<FirebaseApp> initializeFirebase({
+  static void initializeFirebase({
     required BuildContext context,
-  }) async {
-    FirebaseApp firebaseApp = await Firebase.initializeApp();
-
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      Navigator.pushNamed(context, "home");
-    }
-
-    return firebaseApp;
+  }) {
+    Firebase.initializeApp().then((firebaseApp) {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        FirebaseFirestore.instance.doc("users/${user.uid}").get().then((doc) {
+          if (doc.exists) {
+            final data = doc.data();
+            if (data!['role'] == "member") {
+              Navigator.pushReplacementNamed(
+                context,
+                "member/home",
+              );
+            } else if (data['role'] == "staff") {
+              Navigator.pushReplacementNamed(context, "staff/home");
+            } else if (data['role'] == "student") {
+              Navigator.pushReplacementNamed(context, "student/home");
+            } else if (data['role'] == "admin") {
+              Navigator.pushReplacementNamed(context, "admin/home");
+            }
+          }
+        });
+      }
+    });
   }
 
   static Future<User?> signInWithGoogle({required BuildContext context}) async {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../utils/auth.dart';
 import "./sign_in_button.dart";
 import 'package:firebase_core/firebase_core.dart';
-import '../../../firebase_options.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -11,6 +10,12 @@ class SignInScreen extends StatefulWidget {
 }
 
 class SignInScreenState extends State<SignInScreen> {
+  @override
+  void initState() {
+    Authentication.initializeFirebase(context: context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

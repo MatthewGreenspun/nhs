@@ -68,13 +68,17 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                         } else {
                           final data = doc.data();
                           if (data!['role'] == "member") {
-                            Navigator.pushNamed(context, "member/home");
+                            Navigator.pushReplacementNamed(
+                                context, "member/home");
                           } else if (data['role'] == "staff") {
-                            Navigator.pushNamed(context, "staff/home");
+                            Navigator.pushReplacementNamed(
+                                context, "staff/home");
                           } else if (data['role'] == "student") {
-                            Navigator.pushNamed(context, "student/home");
+                            Navigator.pushReplacementNamed(
+                                context, "student/home");
                           } else if (data['role'] == "admin") {
-                            Navigator.pushNamed(context, "admin/home");
+                            Navigator.pushReplacementNamed(
+                                context, "admin/home");
                           }
                         }
                       });
@@ -83,6 +87,7 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                           content: "use your Bronx Science email.");
                     }
                   }
+                }).then((value) {
                   setState(() {
                     _isSigningIn = false;
                   });

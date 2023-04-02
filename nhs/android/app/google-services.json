@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "756518976496",
+    "project_id": "bronx-science-nhs-e9bcc",
+    "storage_bucket": "bronx-science-nhs-e9bcc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756518976496:android:e70ed670c4892958f2fb35",
+        "android_client_info": {
+          "package_name": "com.example.nhs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756518976496-g2d16pcd03m0nl76namdi7qp410l6bnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvfZGRt24zDV8V_g7tdYksIB5NPO7Sxok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756518976496-g2d16pcd03m0nl76namdi7qp410l6bnj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

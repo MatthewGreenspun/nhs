@@ -7,10 +7,10 @@ class Member {
   String name;
   String email;
   int graduationYear;
-  int projectCredits;
-  int serviceCredits;
-  int tutoringCredits;
-  int probationLevel;
+  double projectCredits;
+  double serviceCredits;
+  double tutoringCredits;
+  double probationLevel;
   List<String> tutoringSubjects;
   Map<int, List<String>> freePeriods;
 

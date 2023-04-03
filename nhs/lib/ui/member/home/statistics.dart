@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "../../../models/index.dart";
+import "../../../utils/fmt.dart";
 
 class Statistics extends StatelessWidget {
   final Member member;
@@ -23,7 +24,7 @@ class Statistics extends StatelessWidget {
                           fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     Text(
-                      member.graduationYear.toString(),
+                      fmtSemester(),
                       style: const TextStyle(fontSize: 20),
                     )
                   ],
@@ -34,7 +35,7 @@ class Statistics extends StatelessWidget {
                 Column(
                   children: [
                     CircleAvatar(
-                      child: Text(member.projectCredits.toString()),
+                      child: Text(fmtCredits(member.projectCredits)),
                     ),
                     const Text("Project")
                   ],
@@ -42,7 +43,7 @@ class Statistics extends StatelessWidget {
                 Column(
                   children: [
                     CircleAvatar(
-                      child: Text(member.serviceCredits.toString()),
+                      child: Text(fmtCredits(member.serviceCredits)),
                     ),
                     const Text("Service")
                   ],
@@ -50,7 +51,7 @@ class Statistics extends StatelessWidget {
                 Column(
                   children: [
                     CircleAvatar(
-                      child: Text(member.tutoringCredits.toString()),
+                      child: Text(fmtCredits(member.tutoringCredits)),
                     ),
                     const Text("Tutoring")
                   ],
@@ -58,7 +59,7 @@ class Statistics extends StatelessWidget {
                 Column(
                   children: [
                     CircleAvatar(
-                      child: Text(member.probationLevel.toString()),
+                      child: Text(fmtCredits(member.probationLevel)),
                     ),
                     const Text("Probation")
                   ],

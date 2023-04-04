@@ -47,20 +47,21 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                               .get()
                               .then((doc) {
                             if (!doc.exists) {
-                              Navigator.pushNamed(context, "student/home");
+                              Navigator.pushReplacementNamed(
+                                  context, "student/home");
                             } else {
                               final data = doc.data();
                               if (data!['role'] == "member") {
-                                Navigator.pushNamed(
+                                Navigator.pushReplacementNamed(
                                     context, "member/account-setup");
                               } else if (data['role'] == "staff") {
-                                Navigator.pushNamed(
+                                Navigator.pushReplacementNamed(
                                     context, "staff/account-setup");
                               } else if (data['role'] == "student") {
-                                Navigator.pushNamed(
+                                Navigator.pushReplacementNamed(
                                     context, "student/account-setup");
                               } else if (data['role'] == "admin") {
-                                Navigator.pushNamed(
+                                Navigator.pushReplacementNamed(
                                     context, "admin/account-setup");
                               }
                             }

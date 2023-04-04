@@ -14,7 +14,9 @@ class BasicInfo extends StatefulWidget {
 
 class _BasicInfoState extends State<BasicInfo> {
   late TextEditingController _nameController;
+  late FocusNode _nameNode;
   late TextEditingController _graduationYearController;
+  late FocusNode _graduationYearNode;
 
   @override
   void initState() {
@@ -22,12 +24,15 @@ class _BasicInfoState extends State<BasicInfo> {
     _nameController.text = widget.member.name;
     _graduationYearController = TextEditingController();
     _graduationYearController.text = widget.member.graduationYear.toString();
+    _nameNode = FocusNode();
+    _graduationYearNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _graduationYearController.dispose();
     super.dispose();
   }
 
@@ -45,6 +50,7 @@ class _BasicInfoState extends State<BasicInfo> {
                 Container(
                     margin: const EdgeInsets.all(8),
                     child: TextFormField(
+                      focusNode: _nameNode,
                       controller: _nameController,
                       onChanged: (value) {
                         widget.member.name = value;
@@ -57,6 +63,7 @@ class _BasicInfoState extends State<BasicInfo> {
                     child: Container(
                         margin: const EdgeInsets.all(8),
                         child: TextFormField(
+                          focusNode: _graduationYearNode,
                           controller: _graduationYearController,
                           keyboardType: TextInputType.phone,
                           inputFormatters: [
@@ -70,6 +77,8 @@ class _BasicInfoState extends State<BasicInfo> {
                         ))),
                 ElevatedButton(
                   onPressed: () {
+                    _nameNode.unfocus();
+                    _graduationYearNode.unfocus();
                     widget.pageController.nextPage(
                         duration: const Duration(milliseconds: 200),
                         curve: Curves.bounceInOut);

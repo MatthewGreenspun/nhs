@@ -102,7 +102,7 @@ class _FreePeriodsState extends State<FreePeriods> {
                     setState(() {
                       _isLoading = true;
                     });
-                    Navigator.pushNamed(context, "member/home");
+                    Navigator.pushReplacementNamed(context, "member/home");
                   });
                 },
           child: const Text("Finish Setup"))

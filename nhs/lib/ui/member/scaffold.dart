@@ -7,6 +7,7 @@ import "package:flutter_mobx/flutter_mobx.dart";
 import "package:google_fonts/google_fonts.dart";
 import "./opportunities/opportunities.dart";
 import "./settings/settings.dart";
+import "../shared/appbar/appbar.dart";
 
 class MemberScaffold extends StatefulWidget {
   const MemberScaffold({super.key});
@@ -21,29 +22,14 @@ class _MemberScaffoldState extends State<MemberScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
     return Consumer<MemberStore>(
         builder: (_, memberStore, __) => Observer(
             builder: (context) => memberStore.member == null
                 ? const Center(child: CircularProgressIndicator())
                 : Scaffold(
-                    appBar: _currentIndex == 1
+                    appBar: _currentIndex == 1 // Opportunities Page
                         ? null
-                        : AppBar(
-                            title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "National Honor Society",
-                                    style: GoogleFonts.francoisOne(
-                                        color: Colors.white),
-                                  ),
-                                  CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(user.photoURL!))
-                                ]),
-                          ),
+                        : const NHSAppBar(),
                     body: _pages[_currentIndex],
                     bottomNavigationBar: BottomNavigationBar(
                         onTap: (idx) {
@@ -54,12 +40,13 @@ class _MemberScaffoldState extends State<MemberScaffold> {
                         currentIndex: _currentIndex,
                         items: const [
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.home), label: "Home"),
+                              icon: Icon(Icons.home_outlined), label: "Home"),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.settings_accessibility),
+                              icon: Icon(Icons.workspace_premium_outlined),
                               label: "Opportunities"),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.settings), label: "Settings"),
+                              icon: Icon(Icons.settings_outlined),
+                              label: "Settings"),
                         ]),
                   )));
   }

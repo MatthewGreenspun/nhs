@@ -91,6 +91,9 @@ class _FreePeriodsState extends State<FreePeriods> {
           onPressed: _isLoading
               ? null
               : () {
+                  setState(() {
+                    _isLoading = true;
+                  });
                   widget.member.freePeriods = freePeriods;
                   final user = FirebaseAuth.instance.currentUser!;
 

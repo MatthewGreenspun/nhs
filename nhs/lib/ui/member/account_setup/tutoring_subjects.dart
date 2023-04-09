@@ -98,7 +98,7 @@ class TutoringSubjects extends StatefulWidget {
 }
 
 class _TutoringSubjectsState extends State<TutoringSubjects> {
-  Set<String> _chosenClasses = {};
+  final Set<String> _chosenClasses = {};
 
   void onSelect(String className) {
     setState(() {

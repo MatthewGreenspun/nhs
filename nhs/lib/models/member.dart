@@ -1,4 +1,5 @@
 import "package:json_annotation/json_annotation.dart";
+import "package:nhs/models/index.dart";
 part "member.g.dart";
 
 @JsonSerializable()
@@ -13,6 +14,9 @@ class Member {
   double probationLevel;
   List<String> tutoringSubjects;
   Map<int, List<String>> freePeriods;
+  @JsonKey(includeFromJson: false)
+  @JsonKey(includeToJson: false)
+  List<ServiceSnippet> opportunities;
 
   Member(
       {required this.name,
@@ -23,7 +27,8 @@ class Member {
       this.tutoringCredits = 0,
       this.probationLevel = 0,
       this.tutoringSubjects = const [],
-      this.freePeriods = const {}});
+      this.freePeriods = const {},
+      this.opportunities = const []});
 
   factory Member.fromJson(Map<String, dynamic> json) => _$MemberFromJson(json);
   Map<String, dynamic> toJson() => _$MemberToJson(this);

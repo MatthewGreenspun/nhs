@@ -6,6 +6,17 @@ class Statistics extends StatelessWidget {
   final Member member;
   const Statistics({super.key, required this.member});
 
+  Widget stat(String label, double value) {
+    return Column(
+      children: [
+        CircleAvatar(
+          child: Text(fmtCredits(value)),
+        ),
+        Text(label)
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -32,38 +43,10 @@ class Statistics extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  children: [
-                    CircleAvatar(
-                      child: Text(fmtCredits(member.projectCredits)),
-                    ),
-                    const Text("Project")
-                  ],
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      child: Text(fmtCredits(member.serviceCredits)),
-                    ),
-                    const Text("Service")
-                  ],
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      child: Text(fmtCredits(member.tutoringCredits)),
-                    ),
-                    const Text("Tutoring")
-                  ],
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      child: Text(fmtCredits(member.probationLevel)),
-                    ),
-                    const Text("Probation")
-                  ],
-                ),
+                stat("Project", member.projectCredits),
+                stat("Service", member.serviceCredits),
+                stat("Tutoring", member.tutoringCredits),
+                stat("Probation", member.probationLevel),
               ],
             )
           ]),

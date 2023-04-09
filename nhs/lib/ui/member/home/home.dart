@@ -1,28 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import '../../../stores/member.store.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:nhs/ui/shared/opportunity/opportunity_page.dart';
+import 'package:nhs/ui/shared/opportunity/opportunity_tile.dart';
+import '../../../models/index.dart';
 import "./statistics.dart";
 
 class MemberHome extends StatelessWidget {
-  const MemberHome({super.key});
+  final Member? member;
+  const MemberHome({super.key, required this.member});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MemberStore>(
-        builder: (_, memberStore, __) => Observer(
-            builder: (context) => Column(
-                  children: [
-                    Statistics(member: memberStore.member!),
-                    const Text(
-                      "Upcoming Opportunities",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+    if (member == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return Column(
+      children: [
+        Statistics(member: member!),
+        const Text(
+          "Upcoming Opportunities",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        Expanded(
+            child: ListView(
+          children: ListTile.divideTiles(
+              color: Theme.of(context).colorScheme.primary,
+              context: context,
+              tiles: member!.opportunities.map((serviceSnippet) => ListTile(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OpportunityPage(
+                                  id: serviceSnippet.opportunityId,
+                                  member: member,
+                                ))),
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: const Icon(Icons.workspace_premium_outlined),
                     ),
-                    const Text("Past Opportunities",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 25))
-                  ],
-                )));
+                    title: Text(serviceSnippet.title),
+                    subtitle: Text(
+                        DateFormat.MMMMEEEEd().format(serviceSnippet.date)),
+                  ))).toList(),
+        ))
+      ],
+    );
   }
 }

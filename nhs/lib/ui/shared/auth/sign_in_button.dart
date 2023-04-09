@@ -38,19 +38,21 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                   if (user != null && user.email != null) {
                     if (user.email!.endsWith("@bxscience.edu")) {
                       FirebaseFirestore.instance
-                          .doc("users/${user.uid}")
+                          .collection("users")
+                          .doc(user.uid)
                           .get()
-                          .then((doc) {
-                        if (!doc.exists) {
+                          .then((userDoc) {
+                        if (!userDoc.exists) {
                           FirebaseFirestore.instance
-                              .doc("roles/${user.email}")
+                              .collection("roles")
+                              .doc(user.email)
                               .get()
-                              .then((doc) {
-                            if (!doc.exists) {
+                              .then((roleDoc) {
+                            if (!roleDoc.exists) {
                               Navigator.pushReplacementNamed(
-                                  context, "student/home");
+                                  context, "student/account-setup");
                             } else {
-                              final data = doc.data();
+                              final data = roleDoc.data();
                               if (data!['role'] == "member") {
                                 Navigator.pushReplacementNamed(
                                     context, "member/account-setup");
@@ -67,7 +69,7 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                             }
                           });
                         } else {
-                          final data = doc.data();
+                          final data = userDoc.data();
                           if (data!['role'] == "member") {
                             Navigator.pushReplacementNamed(
                                 context, "member/home");
@@ -89,9 +91,11 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                     }
                   }
                 }).then((value) {
-                  setState(() {
-                    _isSigningIn = false;
-                  });
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    setState(() {
+                      _isSigningIn = false;
+                    });
+                  }
                 });
               },
               child: Padding(

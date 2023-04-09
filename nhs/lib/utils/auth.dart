@@ -26,7 +26,11 @@ class Authentication {
     Firebase.initializeApp().then((firebaseApp) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        FirebaseFirestore.instance.doc("users/${user.uid}").get().then((doc) {
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(user.uid)
+            .get()
+            .then((doc) {
           if (doc.exists) {
             final data = doc.data();
             if (data!['role'] == "member") {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../utils/auth.dart';
 import "./sign_in_button.dart";
 import 'package:firebase_core/firebase_core.dart';
+import "package:google_fonts/google_fonts.dart";
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -35,11 +36,13 @@ class SignInScreenState extends State<SignInScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'National Honor Society',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.oswald(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(255, 49, 181, 54)),
                     ),
                     Flexible(
                       flex: 1,

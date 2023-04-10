@@ -18,7 +18,6 @@ class OpportunityTile extends StatelessWidget {
               MaterialPageRoute(
                   builder: (context) => OpportunityPage(
                         id: opportunity.id,
-                        opportunity: opportunity,
                         member: member,
                       )));
         },

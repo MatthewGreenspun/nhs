@@ -62,10 +62,27 @@ class _RequestServiceState extends State<RequestService> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: FormBuilder(
             key: _formKey,
             child: Column(children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                  TextButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          onSubmit().then((value) => Navigator.pop(context));
+                        }
+                      },
+                      child: const Text("Save")),
+                ],
+              ),
               Expanded(
                   child: ListView(
                 children: [
@@ -153,13 +170,6 @@ class _RequestServiceState extends State<RequestService> {
                   )
                 ],
               )),
-              FilledButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      onSubmit().then((value) => Navigator.pop(context));
-                    }
-                  },
-                  child: const Text("Create"))
             ])));
   }
 }

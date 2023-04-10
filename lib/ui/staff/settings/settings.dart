@@ -21,9 +21,24 @@ class StaffSettings extends StatelessWidget {
           SettingsContainer(
             title: "Account",
             child: Column(children: [
-              Setting(name: "Display Name", child: Text(staff!.name)),
-              Setting(name: "Email", child: Text(staff!.email)),
-              Setting(name: "Department", child: Text(staff!.department)),
+              Setting(
+                  name: "Display Name",
+                  child: Text(
+                    staff!.name,
+                    style: const TextStyle(fontSize: 12),
+                  )),
+              Setting(
+                  name: "Email",
+                  child: Text(
+                    staff!.email,
+                    style: const TextStyle(fontSize: 12),
+                  )),
+              Setting(
+                  name: "Department",
+                  child: Text(
+                    staff!.department,
+                    style: const TextStyle(fontSize: 12),
+                  )),
               Setting(
                   name: "Sign Out",
                   child: OutlinedButton(

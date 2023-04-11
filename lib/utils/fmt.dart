@@ -53,8 +53,8 @@ DateTime fmtDate(DateTime date, int period) {
   };
   if (date.day == DateTime.thursday) {
     final times = thursdaySchedule[period]!;
-    return date.copyWith(hour: times[0], minute: times[1]);
+    return date.copyWith(hour: times[0], minute: times[1]).toUtc();
   }
   final times = standardSchedule[period]!;
-  return date.copyWith(hour: times[0], minute: times[1]);
+  return date.copyWith(hour: times[0], minute: times[1]).toUtc();
 }

@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nhs/ui/shared/appbar/appbar.dart';
-import '../../models/staff.dart';
-import '../../models/student.dart';
+import '../../models/index.dart';
 import "./home/home.dart";
 import "./settings/settings.dart";
 

@@ -20,27 +20,3 @@ class Staff {
   Map<String, dynamic> toJson() => _$StaffToJson(this);
   factory Staff.fromJson(Map<String, dynamic> json) => _$StaffFromJson(json);
 }
-
-@JsonSerializable()
-class ServiceSnippet {
-  String opportunityId;
-  String title;
-  DateTime date;
-  int period;
-  ServiceSnippet({
-    required this.opportunityId,
-    required this.title,
-    required this.date,
-    required this.period,
-  });
-  Map<String, dynamic> toJson() => _$ServiceSnippetToJson(this);
-  factory ServiceSnippet.fromJson(Map<String, dynamic> json) =>
-      _$ServiceSnippetFromJson(json);
-
-  factory ServiceSnippet.fromOpportunity(Opportunity opportunity) =>
-      ServiceSnippet(
-          opportunityId: opportunity.id,
-          title: opportunity.title,
-          date: opportunity.date,
-          period: opportunity.period);
-}

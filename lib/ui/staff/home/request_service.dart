@@ -43,19 +43,16 @@ class _RequestServiceState extends State<RequestService> {
         .doc(opportunity.id)
         .set(opportunity.toJson())
         .then((_) {
-      final snippetId = const Uuid().v4();
       final snippet = ServiceSnippet(
-          id: snippetId,
           opportunityId: opportunity.id,
           period: period,
           date: date,
           title: title);
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(_user.uid)
-          .collection("posts")
-          .doc(snippetId)
-          .set(snippet.toJson());
+      FirebaseFirestore.instance.collection("users").doc(_user.uid).set({
+        "posts": FieldValue.arrayUnion(
+          [snippet.toJson()],
+        )
+      }, SetOptions(merge: true));
     });
   }
 

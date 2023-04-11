@@ -24,24 +24,11 @@ class _StaffScaffoldState extends State<StaffScaffold> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _stream = FirebaseFirestore.instance
         .collection("users")
         .doc(_user.uid)
         .snapshots();
     _sub = _stream.listen((event) {
-      event.reference.collection("posts").limit(5).snapshots().listen(
-        (postEvent) {
-          print("new post event: $event");
-          if (_staff == null) return;
-          setState(() {
-            _staff!.posts = postEvent.docs
-                .map((postDoc) => ServiceSnippet.fromJson(postDoc.data()))
-                .toList();
-          });
-        },
-      );
-      print("new staff event: $event");
       setState(() {
         _staff = Staff.fromJson(event.data()!);
       });

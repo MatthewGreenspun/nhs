@@ -79,9 +79,9 @@ class StudentHome extends StatelessWidget {
                 FirebaseFirestore.instance
                     .collection("users")
                     .doc(user.uid)
-                    .collection("posts")
-                    .doc(removedSnippet.id)
-                    .delete();
+                    .set({
+                  "posts": FieldValue.arrayRemove([removedSnippet.toJson()])
+                }, SetOptions(merge: true));
               },
               key: Key(post.title),
               child: InkWell(

@@ -10,8 +10,6 @@ class Staff {
   String name;
   String email;
   String department;
-  @JsonKey(includeFromJson: false)
-  @JsonKey(includeToJson: false)
   List<ServiceSnippet> posts;
   Staff(
       {required this.name,
@@ -25,13 +23,11 @@ class Staff {
 
 @JsonSerializable()
 class ServiceSnippet {
-  String id;
   String opportunityId;
   String title;
   DateTime date;
   int period;
   ServiceSnippet({
-    required this.id,
     required this.opportunityId,
     required this.title,
     required this.date,
@@ -43,7 +39,6 @@ class ServiceSnippet {
 
   factory ServiceSnippet.fromOpportunity(Opportunity opportunity) =>
       ServiceSnippet(
-          id: const Uuid().v4(),
           opportunityId: opportunity.id,
           title: opportunity.title,
           date: opportunity.date,

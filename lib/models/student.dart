@@ -8,8 +8,6 @@ class Student {
   String name;
   String email;
   int graduationYear;
-  @JsonKey(includeFromJson: false)
-  @JsonKey(includeToJson: false)
   List<ServiceSnippet> posts;
 
   Student(

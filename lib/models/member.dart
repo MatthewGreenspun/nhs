@@ -14,8 +14,6 @@ class Member {
   double probationLevel;
   List<String> tutoringSubjects;
   Map<int, List<String>> freePeriods;
-  @JsonKey(includeFromJson: false)
-  @JsonKey(includeToJson: false)
   List<ServiceSnippet> opportunities;
 
   Member(

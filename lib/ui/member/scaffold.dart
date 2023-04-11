@@ -18,7 +18,6 @@ class MemberScaffold extends StatefulWidget {
 class _MemberScaffoldState extends State<MemberScaffold> {
   final _user = FirebaseAuth.instance.currentUser!;
   late StreamSubscription _memberSub;
-  late StreamSubscription _opportunitiesSub;
   Member? _member;
   int _currentIndex = 0;
 
@@ -32,15 +31,6 @@ class _MemberScaffoldState extends State<MemberScaffold> {
       setState(() {
         _member = Member.fromJson(event.data()!);
       });
-      final opportunitiesStream =
-          event.reference.collection("opportunities").snapshots();
-      _opportunitiesSub = opportunitiesStream.listen((event) {
-        setState(() {
-          _member!.opportunities = event.docs
-              .map((doc) => ServiceSnippet.fromJson(doc.data()))
-              .toList();
-        });
-      });
     });
     super.initState();
   }
@@ -48,7 +38,6 @@ class _MemberScaffoldState extends State<MemberScaffold> {
   @override
   void dispose() {
     _memberSub.cancel();
-    _opportunitiesSub.cancel();
     super.dispose();
   }
 

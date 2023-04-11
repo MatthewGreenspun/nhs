@@ -20,9 +20,15 @@ class _OpportunityPageState extends State<OpportunityPage> {
   Opportunity? _opportunity;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _sub;
   final _user = FirebaseAuth.instance.currentUser!;
+  bool _isSignedUp = false;
 
   @override
   void initState() {
+    setState(() {
+      _isSignedUp = widget.member != null &&
+          widget.member!.opportunities
+              .any((snippet) => snippet.opportunityId == widget.id);
+    });
     final stream = FirebaseFirestore.instance
         .collection("opportunities")
         .doc(widget.id)
@@ -66,16 +72,12 @@ class _OpportunityPageState extends State<OpportunityPage> {
         .set({"numMembersSignedUp": count.count}, SetOptions(merge: true));
 
     final serviceSnippet = ServiceSnippet.fromOpportunity(_opportunity!);
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(_user.uid)
-        .collection("opportunities")
-        .doc(_opportunity!.id)
-        .set(serviceSnippet.toJson());
+    FirebaseFirestore.instance.collection("users").doc(_user.uid).set({
+      "opportunities": FieldValue.arrayUnion([serviceSnippet.toJson()])
+    }, SetOptions(merge: true));
   }
 
   Future<void> cancelRegistration() async {
-    print('cancel registration');
     await FirebaseFirestore.instance
         .collection("opportunities")
         .doc(_opportunity!.id)
@@ -93,12 +95,10 @@ class _OpportunityPageState extends State<OpportunityPage> {
         .doc(widget.id)
         .set({"numMembersSignedUp": count.count}, SetOptions(merge: true));
 
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(_user.uid)
-        .collection("opportunities")
-        .doc(_opportunity!.id)
-        .delete();
+    final serviceSnippet = ServiceSnippet.fromOpportunity(_opportunity!);
+    FirebaseFirestore.instance.collection("users").doc(_user.uid).set({
+      "opportunities": FieldValue.arrayRemove([serviceSnippet.toJson()])
+    }, SetOptions(merge: true));
   }
 
   Widget attributeContainer(IconData icon, String text) {
@@ -114,9 +114,6 @@ class _OpportunityPageState extends State<OpportunityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isSignedUp = widget.member != null &&
-        widget.member!.opportunities
-            .any((snippet) => snippet.opportunityId == widget.id);
     return Scaffold(
         appBar: const NHSAppBar(),
         body: _opportunity == null
@@ -141,26 +138,38 @@ class _OpportunityPageState extends State<OpportunityPage> {
                         Icons.calendar_month_outlined,
                         "${DateFormat.MMMMEEEEd().format(_opportunity!.date)}, Period ${_opportunity!.period}",
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (context) =>
-                                  MembersSignedUp(opportunityId: widget.id));
-                        },
-                        child: attributeContainer(Icons.people_outlined,
-                            "${_opportunity!.numMembersSignedUp} / ${_opportunity!.membersNeeded}"),
+                      Row(
+                        children: [
+                          attributeContainer(Icons.people_outlined,
+                              "${_opportunity!.numMembersSignedUp} / ${_opportunity!.membersNeeded}"),
+                          TextButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  context: context,
+                                  enableDrag: true,
+                                  isDismissible: true,
+                                  builder: (context) => MembersSignedUp(
+                                      opportunityId: widget.id));
+                            },
+                            child: _opportunity!.numMembersSignedUp > 0
+                                ? const Text("view")
+                                : Container(),
+                          ),
+                        ],
                       ),
                       widget.member != null
                           ? FilledButton(
                               onPressed: () {
-                                if (isSignedUp) {
+                                if (_isSignedUp) {
                                   cancelRegistration();
                                 } else {
                                   signUp();
                                 }
+                                setState(() {
+                                  _isSignedUp = !_isSignedUp;
+                                });
                               },
-                              child: Text(isSignedUp
+                              child: Text(_isSignedUp
                                   ? "Cancel Registration"
                                   : "Sign Up"))
                           : Container(),

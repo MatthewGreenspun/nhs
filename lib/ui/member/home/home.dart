@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nhs/ui/shared/opportunity/opportunity_page.dart';
-import 'package:nhs/ui/shared/opportunity/opportunity_tile.dart';
 import '../../../models/index.dart';
 import "./statistics.dart";
 
@@ -19,10 +18,28 @@ class MemberHome extends StatelessWidget {
     return Column(
       children: [
         Statistics(member: member!),
-        const Text(
-          "Upcoming Opportunities",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-        ),
+        member!.opportunities.isEmpty
+            ? Expanded(
+                child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  CircleAvatar(
+                      radius: 30,
+                      child: Icon(
+                        Icons.workspace_premium_outlined,
+                        size: 50,
+                      )),
+                  Text(
+                    "No Opportunities",
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                  Text("Sign up on the opportunities page.")
+                ],
+              ))
+            : const Text(
+                "Upcoming Opportunities",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+              ),
         Expanded(
             child: ListView(
           children: ListTile.divideTiles(

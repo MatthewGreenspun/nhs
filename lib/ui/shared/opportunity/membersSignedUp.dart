@@ -23,8 +23,8 @@ class MembersSignedUp extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 8),
                     child: Text(
                       snapshot.data!.docs.isEmpty
-                          ? "No Members Signed Up"
-                          : "Members Signed Up",
+                          ? "No one signed up"
+                          : "NHS Members",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 25),

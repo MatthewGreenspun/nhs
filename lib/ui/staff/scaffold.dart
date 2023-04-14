@@ -2,10 +2,12 @@ import "dart:async";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:nhs/ui/shared/rating/single_rating.dart";
 import "package:nhs/ui/staff/home/home.dart";
 import "package:nhs/ui/staff/settings/settings.dart";
 import "../shared/appbar/appbar.dart";
 import "../../models/index.dart";
+import "../shared/rating/multi_rating.dart";
 import "./home/request_service.dart";
 
 class StaffScaffold extends StatefulWidget {
@@ -31,6 +33,41 @@ class _StaffScaffoldState extends State<StaffScaffold> {
     _sub = _stream.listen((event) {
       setState(() {
         _staff = Staff.fromJson(event.data()!);
+        _staff!.posts.forEach((post) async {
+          if (DateTime.now().toUtc().isAfter(post.date)) {
+            final opportunityDoc = FirebaseFirestore.instance
+                .collection("opportunities")
+                .doc(post.opportunityId);
+            final opportunity =
+                Opportunity.fromJson((await opportunityDoc.get()).data()!);
+            final membersCollection =
+                await opportunityDoc.collection("membersSignedUp").get();
+            opportunity.membersSignedUp = membersCollection.docs
+                .map((doc) => MemberSnippet.fromJson(doc.data()))
+                .toList();
+            if (opportunity.membersSignedUp.length > 1) {
+              () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MultiRating(
+                              opportunity: opportunity,
+                              snippet: post,
+                            )));
+              }();
+            } else {
+              () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SingleRating(
+                              opportunity: opportunity,
+                              snippet: post,
+                            )));
+              }();
+            }
+          }
+        });
       });
     });
 

@@ -127,7 +127,7 @@ class _OpportunityPageState extends State<OpportunityPage> {
                     children: [
                       Text(
                         _opportunity!.title,
-                        style: const TextStyle(fontSize: 25),
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       Divider(
                         color: Theme.of(context).colorScheme.primary,

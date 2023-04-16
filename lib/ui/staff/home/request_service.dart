@@ -1,9 +1,6 @@
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "package:nhs/utils/fmt.dart";
-import "package:uuid/uuid.dart";
+import "package:nhs/services/staff_student_service.dart";
 import "../../../models/index.dart";
 import "package:flutter_form_builder/flutter_form_builder.dart";
 
@@ -16,44 +13,22 @@ class RequestService extends StatefulWidget {
 }
 
 class _RequestServiceState extends State<RequestService> {
-  final _user = FirebaseAuth.instance.currentUser!;
+  final _staffService = StaffService();
   final _formKey = GlobalKey<FormBuilderState>();
 
   Future onSubmit() async {
     final period = _formKey.currentState!.fields['period']!.value as int;
-    final DateTime date =
-        fmtDate(_formKey.currentState!.fields['date']!.value, period);
     final title = _formKey.currentState!.fields['title']!.value as String;
-    final opportunity = Opportunity(
-        creatorId: _user.uid,
+    return _staffService.requestService(
+        title: title,
         creatorName: widget.staff.name,
-        department: widget.staff.department,
-        opportunityType: OpportunityType.service,
-        credits: 1,
         description:
             _formKey.currentState!.fields['description']!.value as String,
+        department: widget.staff.department,
         membersNeeded: int.parse(
             _formKey.currentState!.fields['membersNeeded']!.value as String),
-        membersSignedUp: [],
-        date: date,
         period: period,
-        title: title);
-    return FirebaseFirestore.instance
-        .collection("opportunities")
-        .doc(opportunity.id)
-        .set(opportunity.toJson())
-        .then((_) {
-      final snippet = ServiceSnippet(
-          opportunityId: opportunity.id,
-          period: period,
-          date: date,
-          title: title);
-      FirebaseFirestore.instance.collection("users").doc(_user.uid).set({
-        "posts": FieldValue.arrayUnion(
-          [snippet.toJson()],
-        )
-      }, SetOptions(merge: true));
-    });
+        date: _formKey.currentState!.fields['date']!.value as DateTime);
   }
 
   @override

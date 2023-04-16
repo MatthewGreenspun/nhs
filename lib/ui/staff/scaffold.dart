@@ -2,6 +2,7 @@ import "dart:async";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:nhs/services/staff_student_service.dart";
 import "package:nhs/ui/shared/rating/single_rating.dart";
 import "package:nhs/ui/staff/home/home.dart";
 import "package:nhs/ui/staff/settings/settings.dart";
@@ -18,6 +19,7 @@ class StaffScaffold extends StatefulWidget {
 }
 
 class _StaffScaffoldState extends State<StaffScaffold> {
+  final _staffService = StaffService();
   final _user = FirebaseAuth.instance.currentUser!;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _stream;
   late StreamSubscription _sub;
@@ -26,14 +28,11 @@ class _StaffScaffoldState extends State<StaffScaffold> {
 
   @override
   void initState() {
-    _stream = FirebaseFirestore.instance
-        .collection("users")
-        .doc(_user.uid)
-        .snapshots();
-    _sub = _stream.listen((event) {
+    _staffService.stream.listen((staff) {
       setState(() {
-        _staff = Staff.fromJson(event.data()!);
+        _staff = staff;
         _staff!.posts.forEach((post) async {
+          // TODO: move this logic into an OpportunityService class
           if (DateTime.now().toUtc().isAfter(post.date)) {
             final opportunityDoc = FirebaseFirestore.instance
                 .collection("opportunities")

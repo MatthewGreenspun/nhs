@@ -1,26 +1,6 @@
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
-import "../../../models/staff.dart";
-
-const kDepartments = [
-  "Art",
-  "Biology",
-  "English",
-  "Mathematics and Computer Science",
-  "Music",
-  "Physical Science and Engineering",
-  "Social Studies",
-  "World Languages",
-  "Physical Education",
-  "Administration",
-  "Custodial",
-  "Guidance",
-  "School Aides",
-  "Secretaries",
-  "Security",
-  "Technology",
-];
+import "package:nhs/services/staff_student_service.dart";
+import "../../shared/constants.dart";
 
 class StaffAccountSetup extends StatefulWidget {
   const StaffAccountSetup({super.key});
@@ -30,7 +10,7 @@ class StaffAccountSetup extends StatefulWidget {
 }
 
 class _StaffAccountSetupState extends State<StaffAccountSetup> {
-  final staff = Staff(name: "", email: "", department: "");
+  final _staffService = StaffService();
   late TextEditingController _nameController;
   late TextEditingController _departmentController;
   late FocusNode _node;
@@ -38,14 +18,27 @@ class _StaffAccountSetupState extends State<StaffAccountSetup> {
 
   @override
   void initState() {
-    final user = FirebaseAuth.instance.currentUser!;
-    staff.name = user.displayName!;
-    staff.email = user.email!;
     _nameController = TextEditingController();
     _departmentController = TextEditingController();
-    _nameController.text = staff.name;
+    _nameController.text = _staffService.user.displayName!;
     _node = FocusNode();
     super.initState();
+  }
+
+  void onSubmit() {
+    setState(() {
+      _isLoading = true;
+    });
+    _node.unfocus();
+    _staffService
+        .createStaff(
+            name: _nameController.text, department: _departmentController.text)
+        .then((value) {
+      Navigator.pushReplacementNamed(context, "staff/home");
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
@@ -68,7 +61,6 @@ class _StaffAccountSetupState extends State<StaffAccountSetup> {
                 child: TextFormField(
                   focusNode: _node,
                   controller: _nameController,
-                  onChanged: (value) => staff.name = value,
                   decoration: const InputDecoration(label: Text("Name")),
                 ),
               ),
@@ -83,34 +75,10 @@ class _StaffAccountSetupState extends State<StaffAccountSetup> {
                           label: department,
                         ))
                     .toList(),
-                onSelected: (String? value) {
-                  setState(() {
-                    staff.department = value!;
-                  });
-                },
               ),
               Expanded(child: Container()),
               ElevatedButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          final user = FirebaseAuth.instance.currentUser!;
-                          _node.unfocus();
-                          FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(user.uid)
-                              .set(staff.toJson())
-                              .then((value) {
-                            Navigator.pushReplacementNamed(
-                                context, "staff/home");
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          });
-                        },
+                  onPressed: _isLoading ? null : onSubmit,
                   child: const Text("   Finish Setup   "))
             ],
           )),

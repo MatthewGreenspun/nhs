@@ -1,8 +1,7 @@
-import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "../../../models/student.dart";
+import "package:nhs/services/staff_student_service.dart";
 
 class StudentAccountSetup extends StatefulWidget {
   const StudentAccountSetup({super.key});
@@ -12,6 +11,7 @@ class StudentAccountSetup extends StatefulWidget {
 }
 
 class _StudentAccountSetupState extends State<StudentAccountSetup> {
+  final _studentService = StudentService();
   late TextEditingController _nameController;
   late FocusNode _nameNode;
   late TextEditingController _graduationYearController;
@@ -28,6 +28,25 @@ class _StudentAccountSetupState extends State<StudentAccountSetup> {
     _graduationYearController.text = DateTime.now().year.toString();
     _graduationYearNode = FocusNode();
     super.initState();
+  }
+
+  void onSubmit() {
+    setState(() {
+      _isLoading = true;
+    });
+    final user = FirebaseAuth.instance.currentUser!;
+    _nameNode.unfocus();
+    _graduationYearNode.unfocus();
+    _studentService
+        .createStudent(
+            name: _nameController.text,
+            graduationYear: int.parse(_graduationYearController.text))
+        .then((value) {
+      Navigator.pushReplacementNamed(context, "student/home");
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
@@ -66,32 +85,7 @@ class _StudentAccountSetupState extends State<StudentAccountSetup> {
               ),
               Expanded(child: Container()),
               ElevatedButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          final user = FirebaseAuth.instance.currentUser!;
-                          _nameNode.unfocus();
-                          _graduationYearNode.unfocus();
-                          final student = Student(
-                              name: _nameController.text,
-                              email: user.email!,
-                              graduationYear:
-                                  int.parse(_graduationYearController.text));
-                          FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(user.uid)
-                              .set(student.toJson())
-                              .then((value) {
-                            Navigator.pushReplacementNamed(
-                                context, "student/home");
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          });
-                        },
+                  onPressed: _isLoading ? null : onSubmit,
                   child: const Text("   Finish Setup   "))
             ],
           )),

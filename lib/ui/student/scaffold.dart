@@ -1,9 +1,8 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhs/services/staff_student_service.dart';
 import 'package:nhs/ui/shared/appbar/appbar.dart';
+import 'package:nhs/ui/student/home/request_tutoring.dart';
 import '../../models/index.dart';
 import "./home/home.dart";
 import "./settings/settings.dart";
@@ -16,38 +15,25 @@ class StudentScaffold extends StatefulWidget {
 }
 
 class _StudentScaffoldState extends State<StudentScaffold> {
-  final _user = FirebaseAuth.instance.currentUser!;
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> _stream;
+  final _studentService = StudentService();
   late StreamSubscription _sub;
   Student? _student;
   int _currentIndex = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
-    _stream = FirebaseFirestore.instance
-        .collection("users")
-        .doc(_user.uid)
-        .snapshots();
-    _sub = _stream.listen((event) {
-      event.reference.collection("posts").limit(5).snapshots().listen(
-        (postEvent) {
-          print("new post event: $event");
-          if (_student == null) return;
-          setState(() {
-            _student!.posts = postEvent.docs
-                .map((postDoc) => ServiceSnippet.fromJson(postDoc.data()))
-                .toList();
-          });
-        },
-      );
-      print("new staff event: $event");
+    _sub = _studentService.stream.listen((student) {
       setState(() {
-        _student = Student.fromJson(event.data()!);
+        _student = student;
       });
     });
-
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
   }
 
   @override
@@ -82,7 +68,15 @@ class _StudentScaffoldState extends State<StudentScaffold> {
                 icon: Icon(Icons.settings_outlined), label: "Settings"),
           ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+              useSafeArea: true,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => RequestTutoring(
+                    student: _student!,
+                  ));
+        },
         child: const Icon(Icons.add),
       ),
     );

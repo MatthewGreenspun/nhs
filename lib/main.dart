@@ -5,6 +5,7 @@ import "package:nhs/ui/student/scaffold.dart";
 import "./firebase_options.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:cloud_functions/cloud_functions.dart";
 import "package:flutter/foundation.dart";
 import "./ui/member/account_setup/account_setup.dart";
 import "./ui/shared/auth/sign_in_screen.dart";
@@ -22,6 +23,7 @@ Future<void> main() async {
     print("using emulator");
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      FirebaseFunctions.instance.useFunctionsEmulator("localhost", 5001);
       await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     } catch (e) {
       // ignore: avoid_print

@@ -6,7 +6,7 @@ service cloud.firestore {
     }
   
     match /users/{userId} {
-      allow read: if request.auth.uid == userId;
+      allow read: if request.auth != null; // other students or staff can request a specific member. 
       allow create: if request.auth != null;
       allow update: if getRole() == 'admin' || request.auth.uid == userId;
       allow list, delete: if getRole() == 'admin';
@@ -26,7 +26,7 @@ service cloud.firestore {
     
     match /opportunities/{opportunityId} {
     	allow read: if request.auth != null;
-      allow create: if getRole() == 'staff' || getRole() == 'student' || getRole() == 'admin';
+      allow create: if request.auth != null && request.resource.data.creatorId == request.auth.uid;
       allow update, delete: if getRole() == 'admin' || resource.data.creatorId == request.auth.uid || getRole() == 'member'; //TODO: change to update with cloud function instead of allowing member
     }
     

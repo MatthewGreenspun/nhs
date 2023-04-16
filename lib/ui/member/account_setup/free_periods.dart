@@ -2,16 +2,7 @@ import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "../../../models/index.dart";
-
-// First element is an empty string for formatting purposes
-const kDaysOfTheWeek = [
-  "",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday"
-];
+import "../../shared/constants.dart";
 
 class FreePeriods extends StatefulWidget {
   final Member member;

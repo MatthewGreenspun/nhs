@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "package:flutter/foundation.dart";
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
 import '../../../utils/auth.dart';
@@ -36,7 +37,7 @@ class GoogleSignInButtonState extends State<GoogleSignInButton> {
                 Authentication.signInWithGoogle(context: context)
                     .then((User? user) {
                   if (user != null && user.email != null) {
-                    if (user.email!.endsWith("@bxscience.edu")) {
+                    if (user.email!.endsWith("@bxscience.edu") || kDebugMode) {
                       FirebaseFirestore.instance
                           .collection("users")
                           .doc(user.uid)

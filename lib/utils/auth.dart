@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 
 class Authentication {
   static void showSnackBar(BuildContext context, {required String content}) {
@@ -68,7 +68,7 @@ class Authentication {
       }
     } else {
       final GoogleSignIn googleSignIn =
-          GoogleSignIn(hostedDomain: "bxscience.edu");
+          GoogleSignIn(hostedDomain: kDebugMode ? "bxscience.edu" : null);
 
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();

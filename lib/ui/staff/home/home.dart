@@ -26,19 +26,23 @@ class StaffHome extends StatelessWidget {
         ),
       );
     }
-    return ListView(
-        children: staff!.posts
-            .map((post) => SnippetTile(
-                  post: post,
-                  onEdit: () {
-                    Navigator.pop(context);
-                  },
-                  onDelete: () {
-                    staffService
-                        .deleteOpportunity(post)
-                        .then((value) => Navigator.pop(context));
-                  },
-                ))
-            .toList());
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+          children: ListTile.divideTiles(
+              context: context,
+              color: Theme.of(context).colorScheme.primary,
+              tiles: staff!.posts.map((post) => SnippetTile(
+                    post: post,
+                    onEdit: () {
+                      Navigator.pop(context);
+                    },
+                    onDelete: () {
+                      staffService
+                          .deleteOpportunity(post)
+                          .then((value) => Navigator.pop(context));
+                    },
+                  ))).toList()),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/opportunity_page.dart';
 import '../../../models/index.dart';
 import "./statistics.dart";
@@ -19,23 +20,14 @@ class MemberHome extends StatelessWidget {
       children: [
         Statistics(member: member!),
         member!.opportunities.isEmpty
-            ? Expanded(
-                child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  CircleAvatar(
-                      radius: 30,
-                      child: Icon(
-                        Icons.workspace_premium_outlined,
-                        size: 50,
-                      )),
-                  Text(
-                    "No Opportunities",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                  Text("Sign up on the opportunities page.")
-                ],
-              ))
+            ? const Expanded(
+                child: NoResults(
+                    title: "No Opportunities",
+                    subtitle: "Sign up on the opportunities page",
+                    icon: Icon(
+                      Icons.workspace_premium_outlined,
+                      size: 50,
+                    )))
             : const Text(
                 "Upcoming Opportunities",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),

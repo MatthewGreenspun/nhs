@@ -27,8 +27,10 @@ class StudentHome extends StatelessWidget {
       );
     }
     return ListView(
-        children: student!.posts
-            .map((post) => SnippetTile(
+        children: ListTile.divideTiles(
+            context: context,
+            color: Theme.of(context).colorScheme.primary,
+            tiles: student!.posts.map((post) => SnippetTile(
                   post: post,
                   onEdit: () {
                     Navigator.pop(context);
@@ -38,7 +40,6 @@ class StudentHome extends StatelessWidget {
                         .deleteOpportunity(post)
                         .then((value) => Navigator.pop(context));
                   },
-                ))
-            .toList());
+                ))).toList());
   }
 }

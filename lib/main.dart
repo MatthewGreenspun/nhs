@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:firebase_core/firebase_core.dart";
+import "package:nhs/services/auth_service.dart";
+import "package:nhs/ui/shared/auth/pre_sign_in.dart";
 import "package:nhs/ui/student/account_setup/account_setup.dart";
 import "package:nhs/ui/student/scaffold.dart";
 import "./firebase_options.dart";
@@ -31,27 +33,34 @@ Future<void> main() async {
     }
   }
 
-  runApp(const MyApp());
+  runApp(const NHSApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class NHSApp extends StatelessWidget {
+  const NHSApp({super.key});
+  static const _initialScreens = {
+    UserType.notSignedIn: SignInScreen(),
+    UserType.member: MemberScaffold(),
+    UserType.staff: StaffScaffold(),
+    UserType.student: StudentScaffold()
+  };
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final authService = AuthService();
+    const primaryColor = Colors.green;
     return MaterialApp(
         title: 'NHS',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: const ColorScheme.light(
-            primary: Colors.green,
+            primary: primaryColor,
           ),
-          primarySwatch: Colors.green,
-          appBarTheme: const AppBarTheme(backgroundColor: Colors.green),
+          appBarTheme: const AppBarTheme(backgroundColor: primaryColor),
         ),
         routes: {
           "admin/home": (context) => Scaffold(),
+          "admin/account-setup": (context) => Scaffold(),
           "member/home": (context) => const MemberScaffold(),
           "member/account-setup": (context) => const MemberAccountSetup(),
           "staff/home": (context) => const StaffScaffold(),
@@ -60,6 +69,14 @@ class MyApp extends StatelessWidget {
           "student/account-setup": (context) => const StudentAccountSetup(),
           "sign-in": (context) => const SignInScreen(),
         },
-        home: const SignInScreen());
+        home: FutureBuilder(
+            future: authService.getUserType(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.data == null) return const SignInScreen();
+                return _initialScreens[snapshot.data]!;
+              }
+              return const PreSignIn();
+            }));
   }
 }

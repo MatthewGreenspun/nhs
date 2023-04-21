@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import "package:flutter/foundation.dart";
-import 'package:firebase_auth/firebase_auth.dart';
-import "package:cloud_firestore/cloud_firestore.dart";
-import '../../../utils/auth.dart';
+import 'package:nhs/services/auth_service.dart';
 
 class GoogleSignInButton extends StatefulWidget {
   const GoogleSignInButton({super.key});
@@ -11,119 +8,80 @@ class GoogleSignInButton extends StatefulWidget {
 }
 
 class GoogleSignInButtonState extends State<GoogleSignInButton> {
+  final _authService = AuthService();
   bool _isSigningIn = false;
+
+  void navigate(String role, bool isNew) {
+    if (context.mounted) {
+      Navigator.pushReplacementNamed(
+          context, "$role/${isNew ? "account-setup" : "home"}");
+    }
+  }
+
+  void onPressed() async {
+    setState(() {
+      _isSigningIn = true;
+    });
+    try {
+      final userType = await _authService.signInWithGoogle();
+      if (userType == UserType.member) {
+        navigate("member", false);
+      } else if (userType == UserType.staff) {
+        navigate("staff", false);
+      } else if (userType == UserType.student) {
+        navigate("student", false);
+      } else if (userType == UserType.admin) {
+        navigate("admin", false);
+      }
+    } on Future<UserType> catch (userType) {
+      if (await userType == UserType.member) {
+        navigate("member", true);
+      } else if (await userType == UserType.staff) {
+        navigate("staff", true);
+      } else if (await userType == UserType.student) {
+        navigate("student", true);
+      } else if (await userType == UserType.admin) {
+        navigate("admin", true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isSigningIn) return const CircularProgressIndicator();
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: _isSigningIn
-          ? const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            )
-          : OutlinedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+      child: FilledButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(
+              Theme.of(context).colorScheme.primary.withAlpha(200)),
+        ),
+        onPressed: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.asset(
+                "assets/logos/google.png",
+                height: 35.0,
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text(
+                  'Sign in with Google',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              onPressed: () {
-                setState(() {
-                  _isSigningIn = true;
-                });
-                Authentication.signInWithGoogle(context: context)
-                    .then((User? user) {
-                  if (user != null && user.email != null) {
-                    if (user.email!.endsWith("@bxscience.edu") || kDebugMode) {
-                      FirebaseFirestore.instance
-                          .collection("users")
-                          .doc(user.uid)
-                          .get()
-                          .then((userDoc) {
-                        if (!userDoc.exists) {
-                          FirebaseFirestore.instance
-                              .collection("roles")
-                              .doc(user.email)
-                              .get()
-                              .then((roleDoc) {
-                            if (!roleDoc.exists) {
-                              Navigator.pushReplacementNamed(
-                                  context, "student/account-setup");
-                            } else {
-                              final data = roleDoc.data();
-                              if (data!['role'] == "member") {
-                                Navigator.pushReplacementNamed(
-                                    context, "member/account-setup");
-                              } else if (data['role'] == "staff") {
-                                Navigator.pushReplacementNamed(
-                                    context, "staff/account-setup");
-                              } else if (data['role'] == "student") {
-                                Navigator.pushReplacementNamed(
-                                    context, "student/account-setup");
-                              } else if (data['role'] == "admin") {
-                                Navigator.pushReplacementNamed(
-                                    context, "admin/account-setup");
-                              }
-                            }
-                          });
-                        } else {
-                          final data = userDoc.data();
-                          if (data!['role'] == "member") {
-                            Navigator.pushReplacementNamed(
-                                context, "member/home");
-                          } else if (data['role'] == "staff") {
-                            Navigator.pushReplacementNamed(
-                                context, "staff/home");
-                          } else if (data['role'] == "student") {
-                            Navigator.pushReplacementNamed(
-                                context, "student/home");
-                          } else if (data['role'] == "admin") {
-                            Navigator.pushReplacementNamed(
-                                context, "admin/home");
-                          }
-                        }
-                      });
-                    } else {
-                      Authentication.showSnackBar(context,
-                          content: "use your Bronx Science email.");
-                    }
-                  }
-                }).then((value) {
-                  if (FirebaseAuth.instance.currentUser == null) {
-                    setState(() {
-                      _isSigningIn = false;
-                    });
-                  }
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      "assets/logos/google.png",
-                      height: 35.0,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Sign in with Google',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

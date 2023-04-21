@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:nhs/services/auth_service.dart';
 import '../../../models/index.dart';
 import '../../shared/settings/settings_container.dart';
 import '../../shared/settings/setting.dart';
-import "../../../utils/auth.dart";
 
 class StaffSettings extends StatelessWidget {
   final Staff? staff;
-  const StaffSettings({super.key, required this.staff});
+  StaffSettings({super.key, required this.staff});
+  final _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class StaffSettings extends StatelessWidget {
                         foregroundColor: MaterialStateProperty.all(Colors.red)),
                     child: const Text("Sign Out"),
                     onPressed: () {
-                      Authentication.signOut(context: context).then((value) =>
+                      _authService.signOut().then((value) =>
                           Navigator.pushReplacementNamed(context, "sign-in"));
                     },
                   ))

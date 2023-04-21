@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../utils/auth.dart';
 import "./sign_in_button.dart";
-import 'package:firebase_core/firebase_core.dart';
 import "package:google_fonts/google_fonts.dart";
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
-  @override
-  SignInScreenState createState() => SignInScreenState();
-}
-
-class SignInScreenState extends State<SignInScreen> {
-  @override
-  void initState() {
-    Authentication.initializeFirebase(context: context);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,40 +24,25 @@ class SignInScreenState extends State<SignInScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'National Honor Society',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.oswald(
+                    Text('National Honor Society',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.oswald(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(255, 49, 181, 54)),
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                        )),
                     Flexible(
                       flex: 1,
                       child: Image.asset(
                         'assets/logos/bronx_science_transparent.png',
-                        height: 160,
+                        height: 250,
                       ),
                     ),
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
-              FutureBuilder(
-                future: Firebase.initializeApp(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text('Error initializing Firebase');
-                  } else if (snapshot.connectionState == ConnectionState.done) {
-                    return GoogleSignInButton();
-                  }
-                  return const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.orange,
-                    ),
-                  );
-                },
-              ),
+              const GoogleSignInButton()
             ],
           ),
         ),

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:nhs/services/auth_service.dart';
 import '../../../models/index.dart';
 import '../../shared/settings/settings_container.dart';
 import '../../shared/settings/setting.dart';
-import "../../../utils/auth.dart";
 import "../../../utils/fmt.dart";
 
 class MemberSettings extends StatelessWidget {
   final Member? member;
-  const MemberSettings({super.key, required this.member});
+  MemberSettings({super.key, required this.member});
+
+  final _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class MemberSettings extends StatelessWidget {
                         foregroundColor: MaterialStateProperty.all(Colors.red)),
                     child: const Text("Sign Out"),
                     onPressed: () {
-                      Authentication.signOut(context: context).then((value) =>
+                      _authService.signOut().then((value) =>
                           Navigator.pushReplacementNamed(context, "sign-in"));
                     },
                   ))

@@ -36,8 +36,6 @@ class Opportunity {
   double credits;
   int membersNeeded;
   int numMembersSignedUp;
-  @JsonKey(includeToJson: false)
-  @JsonKey(includeFromJson: false)
   List<MemberSnippet> membersSignedUp;
 
   Opportunity(

@@ -18,18 +18,15 @@ class MembersSignedUp extends StatelessWidget {
             )),
         Expanded(
             child: ListView(
-          children: ListTile.divideTiles(
-              color: Theme.of(context).colorScheme.primary,
-              context: context,
-              tiles: members.map((member) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(member.profilePicture),
-                  ),
-                  title: Text(member.name),
-                  subtitle: Text(member.email),
-                );
-              })).toList(),
+          children: members.map((member) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(member.profilePicture),
+              ),
+              title: Text(member.name),
+              subtitle: Text(member.email),
+            );
+          }).toList(),
         ))
       ],
     );

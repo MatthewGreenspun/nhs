@@ -4,11 +4,13 @@ class SettingsContainer extends StatelessWidget {
   final String title;
   final Widget child;
   final bool isEditable;
+  final Function()? onEdit;
   const SettingsContainer(
       {super.key,
       this.title = "",
       required this.child,
-      this.isEditable = false});
+      this.isEditable = false,
+      this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class SettingsContainer extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold)),
               isEditable
-                  ? IconButton(onPressed: () {}, icon: const Icon(Icons.edit))
+                  ? IconButton(onPressed: onEdit, icon: const Icon(Icons.edit))
                   : Container()
             ],
           ),

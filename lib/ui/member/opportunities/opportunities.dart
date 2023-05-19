@@ -12,12 +12,24 @@ class Opportunities extends StatefulWidget {
 }
 
 class _OpportunitiesState extends State<Opportunities> {
-  final _chips = ["All", "Projects", "Service", "Tutoring", "Upcoming", "Past"];
+  final _chips = [
+    "All",
+    "Projects",
+    "Service",
+    "Tutoring",
+    "Upcoming",
+    "Past",
+  ];
+  final List<GlobalKey> _chipKeys = [];
+  late ScrollController _chipController;
   int _selectedChip = 0;
-  List<Opportunity> _opportunities = [];
+  final List<Opportunity> _opportunities = [];
 
   @override
   void initState() {
+    _chipKeys.addAll(List.generate(
+        _chips.length, (idx) => GlobalKey(debugLabel: _chips[idx])));
+    _chipController = ScrollController();
     FirebaseFirestore.instance
         .collection("opportunities")
         .limit(10)
@@ -33,6 +45,30 @@ class _OpportunitiesState extends State<Opportunities> {
   }
 
   @override
+  void dispose() {
+    _chipController.dispose();
+    super.dispose();
+  }
+
+  double computeChipScrollOffset(int chipIdx) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final maxScroll = _chipController.position.maxScrollExtent;
+    RenderBox box =
+        _chipKeys[chipIdx].currentContext?.findRenderObject() as RenderBox;
+    final itemSize = box.size.width;
+    Offset position = box.localToGlobal(Offset.zero);
+    final desiredPosition = deviceWidth / 2 - itemSize / 2;
+    final change = position.dx - desiredPosition;
+    if (change + _chipController.offset < 0) {
+      return 0;
+    }
+    if (change + _chipController.offset > maxScroll) {
+      return maxScroll;
+    }
+    return change + _chipController.offset;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Padding(
@@ -43,40 +79,38 @@ class _OpportunitiesState extends State<Opportunities> {
                 Flexible(
                     fit: FlexFit.tight,
                     child: ListView(
+                      controller: _chipController,
                       scrollDirection: Axis.horizontal,
-                      children: _chips
-                          .asMap()
-                          .entries
-                          .map(
-                            (entry) => Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedChip = entry.key;
-                                    });
-                                  },
-                                  child: Chip(
-                                    side: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                    label: Text(
-                                      entry.value,
-                                      style: TextStyle(
-                                          color: entry.key == _selectedChip
-                                              ? Colors.white
-                                              : Colors.black),
-                                    ),
-                                    backgroundColor: entry.key == _selectedChip
-                                        ? Theme.of(context).colorScheme.primary
-                                        : null,
-                                  ),
-                                )),
-                          )
-                          .toList(),
+                      children: _chips.asMap().entries.map(
+                        (entry) {
+                          final idx = entry.key;
+                          return Container(
+                              key: _chipKeys[idx],
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: ActionChip(
+                                label: Text(entry.value),
+                                backgroundColor: idx == _selectedChip
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : null,
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedChip = idx;
+                                  });
+                                  if (_chipKeys
+                                      .any((e) => e.currentContext == null)) {
+                                    return;
+                                  }
+                                  _chipController.animateTo(
+                                      computeChipScrollOffset(idx),
+                                      curve: Curves.decelerate,
+                                      duration:
+                                          const Duration(milliseconds: 200));
+                                },
+                              ));
+                        },
+                      ).toList(),
                     )),
                 Expanded(
                   flex: 10,

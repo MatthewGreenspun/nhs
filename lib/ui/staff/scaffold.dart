@@ -1,14 +1,11 @@
 import "dart:async";
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:nhs/services/staff_student_service.dart";
-import "package:nhs/ui/shared/rating/single_rating.dart";
+import "package:nhs/services/ui_service.dart";
 import "package:nhs/ui/staff/home/home.dart";
 import "package:nhs/ui/staff/settings/settings.dart";
 import "../shared/appbar/appbar.dart";
 import "../../models/index.dart";
-import "../shared/rating/multi_rating.dart";
 import "./home/request_service.dart";
 
 class StaffScaffold extends StatefulWidget {
@@ -19,54 +16,15 @@ class StaffScaffold extends StatefulWidget {
 }
 
 class _StaffScaffoldState extends State<StaffScaffold> {
-  final _staffService = StaffService();
-  final _user = FirebaseAuth.instance.currentUser!;
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> _stream;
-  late StreamSubscription _sub;
+  StreamSubscription? _sub;
   Staff? _staff;
   int _currentIndex = 0;
 
   @override
   void initState() {
-    _staffService.stream.listen((staff) {
+    StaffService.stream.listen((staff) {
       setState(() {
         _staff = staff;
-        _staff!.posts.forEach((post) async {
-          // TODO: move this logic into an OpportunityService class
-          if (DateTime.now().toUtc().isAfter(post.date)) {
-            final opportunityDoc = FirebaseFirestore.instance
-                .collection("opportunities")
-                .doc(post.opportunityId);
-            final opportunity =
-                Opportunity.fromJson((await opportunityDoc.get()).data()!);
-            final membersCollection =
-                await opportunityDoc.collection("membersSignedUp").get();
-            opportunity.membersSignedUp = membersCollection.docs
-                .map((doc) => MemberSnippet.fromJson(doc.data()))
-                .toList();
-            if (opportunity.membersSignedUp.length > 1) {
-              () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MultiRating(
-                              opportunity: opportunity,
-                              snippet: post,
-                            )));
-              }();
-            } else {
-              () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SingleRating(
-                              opportunity: opportunity,
-                              snippet: post,
-                            )));
-              }();
-            }
-          }
-        });
       });
     });
 
@@ -75,7 +33,7 @@ class _StaffScaffoldState extends State<StaffScaffold> {
 
   @override
   void dispose() {
-    _sub.cancel();
+    _sub?.cancel();
     super.dispose();
   }
 
@@ -86,6 +44,19 @@ class _StaffScaffoldState extends State<StaffScaffold> {
         child: CircularProgressIndicator(),
       );
     }
+    final fab = FloatingActionButton(
+      child: const Icon(Icons.add),
+      onPressed: () {
+        showModalBottomSheet(
+            useSafeArea: true,
+            isScrollControlled: true,
+            context: context,
+            builder: (context) => RequestService(
+                  staff: _staff!,
+                ));
+      },
+    );
+    final navigationIsVertical = UIService.isBigScreen(context);
     Widget page;
     if (_currentIndex == 0) {
       page = StaffHome(staff: _staff);
@@ -94,34 +65,57 @@ class _StaffScaffoldState extends State<StaffScaffold> {
     }
     return Scaffold(
       appBar: const NHSAppBar(),
-      body: page,
-      bottomNavigationBar: BottomNavigationBar(
-          onTap: (idx) {
-            setState(() {
-              _currentIndex = idx;
-            });
-          },
-          currentIndex: _currentIndex,
-          items: const [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined), label: "Home"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined), label: "Settings"),
-          ]),
-      floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () {
-                showModalBottomSheet(
-                    useSafeArea: true,
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (context) => RequestService(
-                          staff: _staff!,
-                        ));
-              },
+      body: navigationIsVertical
+          ? Row(
+              children: [
+                NavigationRail(
+                    onDestinationSelected: (idx) {
+                      setState(() {
+                        _currentIndex = idx;
+                      });
+                    },
+                    leading: fab,
+                    labelType: NavigationRailLabelType.all,
+                    destinations: const [
+                      NavigationRailDestination(
+                          padding: EdgeInsets.all(16),
+                          icon: Icon(Icons.home_outlined),
+                          selectedIcon: Icon(Icons.home),
+                          label: Text("Home")),
+                      NavigationRailDestination(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          icon: Icon(Icons.settings_outlined),
+                          selectedIcon: Icon(Icons.settings),
+                          label: Text("Settings")),
+                    ],
+                    selectedIndex: _currentIndex),
+                Expanded(
+                  child: page,
+                )
+              ],
             )
-          : null,
+          : page,
+      bottomNavigationBar: navigationIsVertical
+          ? null
+          : NavigationBar(
+              onDestinationSelected: (idx) {
+                setState(() {
+                  _currentIndex = idx;
+                });
+              },
+              selectedIndex: _currentIndex,
+              destinations: const [
+                  NavigationDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: "Home"),
+                  NavigationDestination(
+                      icon: Icon(Icons.settings_outlined),
+                      selectedIcon: Icon(Icons.settings),
+                      label: "Settings"),
+                ]),
+      floatingActionButton:
+          _currentIndex == 0 && !navigationIsVertical ? fab : null,
     );
   }
 }

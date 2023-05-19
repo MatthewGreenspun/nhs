@@ -6,8 +6,8 @@ import '../models/index.dart';
 import '../utils/fmt.dart';
 
 class _Base {
-  final _fbDB = FirebaseFirestore.instance;
-  final _user = FirebaseAuth.instance.currentUser!;
+  static final _fbDB = FirebaseFirestore.instance;
+  static final _user = FirebaseAuth.instance.currentUser!;
 
   User get user => _user;
 
@@ -38,17 +38,20 @@ class _Base {
 }
 
 class StudentService extends _Base {
-  Stream<Student> get stream => _fbDB
+  static Stream<Student> get stream => _Base._fbDB
       .collection("users")
-      .doc(_user.uid)
+      .doc(_Base._user.uid)
       .snapshots()
       .map((event) => Student.fromJson(event.data()!));
 
   Future<void> createStudent(
       {required String name, required int graduationYear}) {
     final student = Student(
-        name: name, email: _user.email!, graduationYear: graduationYear);
-    return _fbDB.collection("users").doc(_user.uid).set(student.toJson());
+        name: name, email: _Base._user.email!, graduationYear: graduationYear);
+    return _Base._fbDB
+        .collection("users")
+        .doc(_Base._user.uid)
+        .set(student.toJson());
   }
 
   Future<void> requestTutoring(
@@ -59,7 +62,7 @@ class StudentService extends _Base {
       required DateTime date}) async {
     final DateTime utcDate = fmtDate(date, period);
     final opportunity = Opportunity(
-        creatorId: _user.uid,
+        creatorId: _Base._user.uid,
         creatorName: creatorName,
         opportunityType: OpportunityType.tutoring,
         credits: 1,
@@ -74,16 +77,19 @@ class StudentService extends _Base {
 }
 
 class StaffService extends _Base {
-  Stream<Staff> get stream => _fbDB
+  static Stream<Staff> get stream => _Base._fbDB
       .collection("users")
-      .doc(_user.uid)
+      .doc(_Base._user.uid)
       .snapshots()
       .map((event) => Staff.fromJson(event.data()!));
 
   Future<void> createStaff({required String name, required String department}) {
     final student =
-        Staff(name: name, email: _user.email!, department: department);
-    return _fbDB.collection("users").doc(_user.uid).set(student.toJson());
+        Staff(name: name, email: _Base._user.email!, department: department);
+    return _Base._fbDB
+        .collection("users")
+        .doc(_Base._user.uid)
+        .set(student.toJson());
   }
 
   Future<void> requestService(
@@ -96,7 +102,7 @@ class StaffService extends _Base {
       required DateTime date}) async {
     final DateTime utcDate = fmtDate(date, period);
     final opportunity = Opportunity(
-        creatorId: _user.uid,
+        creatorId: _Base._user.uid,
         creatorName: creatorName,
         department: department,
         opportunityType: OpportunityType.service,

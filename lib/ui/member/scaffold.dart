@@ -1,8 +1,8 @@
 import "dart:async";
-import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:nhs/models/index.dart";
+import "package:nhs/services/member_service.dart";
+import "package:nhs/services/ui_service.dart";
 import "package:nhs/ui/member/home/home.dart";
 import "./opportunities/opportunities.dart";
 import "../shared/appbar/appbar.dart";
@@ -16,20 +16,15 @@ class MemberScaffold extends StatefulWidget {
 }
 
 class _MemberScaffoldState extends State<MemberScaffold> {
-  final _user = FirebaseAuth.instance.currentUser!;
   late StreamSubscription _memberSub;
   Member? _member;
   int _currentIndex = 0;
 
   @override
   void initState() {
-    final memberStream = FirebaseFirestore.instance
-        .collection("users")
-        .doc(_user.uid)
-        .snapshots();
-    _memberSub = memberStream.listen((event) {
+    MemberService.stream.listen((event) {
       setState(() {
-        _member = Member.fromJson(event.data()!);
+        _member = event;
       });
     });
     super.initState();
@@ -56,28 +51,66 @@ class _MemberScaffoldState extends State<MemberScaffold> {
     } else {
       page = MemberSettings(member: _member);
     }
+    final navigationIsVertical = UIService.isBigScreen(context);
 
     return Scaffold(
-      appBar: _currentIndex == 1 // Opportunities Page
+      appBar: const NHSAppBar(),
+      body: navigationIsVertical
+          ? Row(
+              children: [
+                NavigationRail(
+                    groupAlignment: -1,
+                    onDestinationSelected: (idx) {
+                      setState(() {
+                        _currentIndex = idx;
+                      });
+                    },
+                    selectedIndex: _currentIndex,
+                    labelType: NavigationRailLabelType.all,
+                    destinations: const [
+                      NavigationRailDestination(
+                          padding: EdgeInsets.all(16),
+                          icon: Icon(Icons.home_outlined),
+                          selectedIcon: Icon(Icons.home),
+                          label: Text("Home")),
+                      NavigationRailDestination(
+                          padding: EdgeInsets.all(16),
+                          icon: Icon(Icons.workspace_premium_outlined),
+                          selectedIcon: Icon(Icons.workspace_premium),
+                          label: Text("Opportunities")),
+                      NavigationRailDestination(
+                          padding: EdgeInsets.all(16),
+                          icon: Icon(Icons.settings_outlined),
+                          selectedIcon: Icon(Icons.settings),
+                          label: Text("Settings")),
+                    ]),
+                Expanded(child: page)
+              ],
+            )
+          : page,
+      bottomNavigationBar: navigationIsVertical
           ? null
-          : const NHSAppBar(),
-      body: page,
-      bottomNavigationBar: BottomNavigationBar(
-          onTap: (idx) {
-            setState(() {
-              _currentIndex = idx;
-            });
-          },
-          currentIndex: _currentIndex,
-          items: const [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined), label: "Home"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.workspace_premium_outlined),
-                label: "Opportunities"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined), label: "Settings"),
-          ]),
+          : NavigationBar(
+              onDestinationSelected: (idx) {
+                setState(() {
+                  _currentIndex = idx;
+                });
+              },
+              selectedIndex: _currentIndex,
+              destinations: const [
+                  NavigationDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: "Home"),
+                  NavigationDestination(
+                      icon: Icon(Icons.workspace_premium_outlined),
+                      selectedIcon: Icon(Icons.workspace_premium),
+                      label: "Opportunities"),
+                  NavigationDestination(
+                      icon: Icon(Icons.settings_outlined),
+                      selectedIcon: Icon(Icons.settings),
+                      label: "Settings"),
+                ]),
     );
   }
 }

@@ -33,26 +33,29 @@ class MemberHome extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
         Expanded(
-            child: ListView(
-          children: ListTile.divideTiles(
-              color: Theme.of(context).colorScheme.primary,
-              context: context,
-              tiles: member!.opportunities.map((serviceSnippet) => ListTile(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => OpportunityPage(
-                                  id: serviceSnippet.opportunityId,
-                                  member: member,
-                                ))),
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: const Icon(Icons.workspace_premium_outlined),
-                    ),
-                    title: Text(serviceSnippet.title),
-                    subtitle: Text(
-                        DateFormat.MMMMEEEEd().format(serviceSnippet.date)),
-                  ))).toList(),
+            child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            children: ListTile.divideTiles(
+                color: Theme.of(context).colorScheme.primary,
+                context: context,
+                tiles: member!.opportunities.map((serviceSnippet) => ListTile(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OpportunityPage(
+                                    id: serviceSnippet.opportunityId,
+                                    member: member,
+                                  ))),
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: const Icon(Icons.workspace_premium_outlined),
+                      ),
+                      title: Text(serviceSnippet.title),
+                      subtitle: Text(
+                          DateFormat.MMMMEEEEd().format(serviceSnippet.date)),
+                    ))).toList(),
+          ),
         ))
       ],
     );

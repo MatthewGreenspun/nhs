@@ -34,7 +34,6 @@ class _StudentAccountSetupState extends State<StudentAccountSetup> {
     setState(() {
       _isLoading = true;
     });
-    final user = FirebaseAuth.instance.currentUser!;
     _nameNode.unfocus();
     _graduationYearNode.unfocus();
     _studentService

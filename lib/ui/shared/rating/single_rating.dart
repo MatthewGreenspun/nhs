@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import "package:flutter_rating_bar/flutter_rating_bar.dart";
 import 'package:intl/intl.dart';
@@ -7,10 +5,8 @@ import '../../../models/index.dart';
 
 class SingleRating extends StatefulWidget {
   final Opportunity opportunity;
-  final ServiceSnippet snippet;
 
-  const SingleRating(
-      {super.key, required this.opportunity, required this.snippet});
+  const SingleRating({super.key, required this.opportunity});
 
   @override
   State<SingleRating> createState() => _SingleRatingState();
@@ -35,10 +31,7 @@ class _SingleRatingState extends State<SingleRating> {
   }
 
   void handleSubmit() {
-    final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance.collection("users").doc(user!.uid).set({
-      "posts": FieldValue.arrayRemove([widget.snippet.toJson()])
-    }, SetOptions(merge: true));
+    // TODO: trigger cloud function to update credits
   }
 
   @override
@@ -122,7 +115,7 @@ class _SingleRatingState extends State<SingleRating> {
                     decoration: InputDecoration(
                         label: const Text("Any comments?"),
                         filled: true,
-                        fillColor: Colors.grey[200]),
+                        fillColor: Colors.grey[200]!.withAlpha(50)),
                   ),
                 ),
                 FilledButton(

@@ -5,10 +5,8 @@ import "../../../models/index.dart";
 
 class MultiRating extends StatefulWidget {
   final Opportunity opportunity;
-  final ServiceSnippet snippet;
 
-  const MultiRating(
-      {super.key, required this.opportunity, required this.snippet});
+  const MultiRating({super.key, required this.opportunity});
 
   @override
   State<MultiRating> createState() => _MultiRatingState();

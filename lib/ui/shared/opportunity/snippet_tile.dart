@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:nhs/models/index.dart";
+import "package:nhs/services/opportunity_service.dart";
 import "package:nhs/ui/shared/opportunity/action_dialog.dart";
 import "opportunity_page.dart";
 
@@ -16,6 +17,7 @@ class SnippetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPassed = post.date.isBefore(DateTime.now());
     return InkWell(
         onTap: () {
           Navigator.push(
@@ -26,20 +28,30 @@ class SnippetTile extends StatelessWidget {
         },
         child: ListTile(
           title: Text(post.title),
-          leading:
-              const CircleAvatar(child: Icon(Icons.workspace_premium_outlined)),
+          leading: hasPassed
+              ? null
+              : const CircleAvatar(
+                  child: Icon(Icons.workspace_premium_outlined)),
           subtitle: Text(DateFormat.MMMMEEEEd().format(post.date)),
-          trailing: IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => ActionDialog(
-                        onEdit: onEdit,
-                        onDelete: onDelete,
-                      ));
-            },
-          ),
+          trailing: hasPassed
+              ? FilledButton(
+                  onPressed: () {
+                    OpportunityService.showRating(context,
+                        opportunityId: post.opportunityId);
+                  },
+                  child: const Text("Approve"),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => ActionDialog(
+                              onEdit: onEdit,
+                              onDelete: onDelete,
+                            ));
+                  },
+                ),
         ));
   }
 }

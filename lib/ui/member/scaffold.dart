@@ -16,7 +16,6 @@ class MemberScaffold extends StatefulWidget {
 }
 
 class _MemberScaffoldState extends State<MemberScaffold> {
-  late StreamSubscription _memberSub;
   Member? _member;
   int _currentIndex = 0;
 
@@ -32,7 +31,6 @@ class _MemberScaffoldState extends State<MemberScaffold> {
 
   @override
   void dispose() {
-    _memberSub.cancel();
     super.dispose();
   }
 

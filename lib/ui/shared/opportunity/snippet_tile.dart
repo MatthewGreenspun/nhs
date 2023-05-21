@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter_rating_bar/flutter_rating_bar.dart";
 import "package:intl/intl.dart";
 import "package:nhs/models/index.dart";
 import "package:nhs/services/opportunity_service.dart";
@@ -34,13 +35,24 @@ class SnippetTile extends StatelessWidget {
                   child: Icon(Icons.workspace_premium_outlined)),
           subtitle: Text(DateFormat.MMMMEEEEd().format(post.date)),
           trailing: hasPassed
-              ? FilledButton(
-                  onPressed: () {
-                    OpportunityService.showRating(context,
-                        opportunityId: post.opportunityId);
-                  },
-                  child: const Text("Approve"),
-                )
+              ? post.isApproved
+                  ? RatingBarIndicator(
+                      rating: post.rating!.toDouble(),
+                      direction: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, _) => const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      itemSize: 20,
+                    )
+                  : FilledButton(
+                      onPressed: () {
+                        OpportunityService.showRating(context,
+                            opportunityId: post.opportunityId);
+                      },
+                      child: const Text("Approve"),
+                    )
               : IconButton(
                   icon: const Icon(Icons.more_vert),
                   onPressed: () {

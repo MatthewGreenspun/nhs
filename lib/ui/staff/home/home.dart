@@ -26,23 +26,61 @@ class StaffHome extends StatelessWidget {
         ),
       );
     }
+    final upcomingService = staff!.posts
+        .where((serviceSnippet) => serviceSnippet.date.isAfter(DateTime.now()));
+    final pastService = staff!.posts.where(
+        (serviceSnippet) => serviceSnippet.date.isBefore(DateTime.now()));
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-          children: ListTile.divideTiles(
-              context: context,
-              color: Theme.of(context).colorScheme.primary,
-              tiles: staff!.posts.map((post) => SnippetTile(
-                    post: post,
-                    onEdit: () {
-                      Navigator.pop(context);
-                    },
-                    onDelete: () {
-                      staffService
-                          .deleteOpportunity(post)
-                          .then((value) => Navigator.pop(context));
-                    },
-                  ))).toList()),
-    );
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            if (upcomingService.isNotEmpty) ...[
+              Text(
+                "Upcoming Service",
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+              Flexible(
+                child: ListView(
+                    children: ListTile.divideTiles(
+                        context: context,
+                        color: Theme.of(context).colorScheme.primary,
+                        tiles: upcomingService.map((post) => SnippetTile(
+                              post: post,
+                              onEdit: () {
+                                Navigator.pop(context);
+                              },
+                              onDelete: () {
+                                staffService
+                                    .deleteOpportunity(post)
+                                    .then((value) => Navigator.pop(context));
+                              },
+                            ))).toList()),
+              ),
+            ],
+            if (pastService.isNotEmpty) ...[
+              Text(
+                "Past Service",
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+              Expanded(
+                child: ListView(
+                    children: ListTile.divideTiles(
+                        context: context,
+                        color: Theme.of(context).colorScheme.primary,
+                        tiles: pastService.map((post) => SnippetTile(
+                              post: post,
+                              onEdit: () {
+                                Navigator.pop(context);
+                              },
+                              onDelete: () {
+                                staffService
+                                    .deleteOpportunity(post)
+                                    .then((value) => Navigator.pop(context));
+                              },
+                            ))).toList()),
+              ),
+            ]
+          ],
+        ));
   }
 }

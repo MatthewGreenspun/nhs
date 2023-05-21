@@ -22,7 +22,7 @@ class MemberSnippet {
   Map<String, dynamic> toJson() => _$MemberSnippetToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Opportunity {
   String id;
   String creatorId;
@@ -37,6 +37,7 @@ class Opportunity {
   int membersNeeded;
   int numMembersSignedUp;
   List<MemberSnippet> membersSignedUp;
+  bool isCompleted;
 
   Opportunity(
       {required this.creatorId,
@@ -50,7 +51,8 @@ class Opportunity {
       this.credits = 1,
       this.membersNeeded = 1,
       this.numMembersSignedUp = 0,
-      this.membersSignedUp = const []})
+      this.membersSignedUp = const [],
+      this.isCompleted = false})
       : id = const Uuid().v4();
 
   factory Opportunity.fromJson(Map<String, dynamic> json) =>
@@ -64,12 +66,18 @@ class ServiceSnippet {
   String title;
   DateTime date;
   int period;
-  ServiceSnippet({
-    required this.opportunityId,
-    required this.title,
-    required this.date,
-    required this.period,
-  });
+  int? rating;
+  double? credits;
+  ServiceSnippet(
+      {required this.opportunityId,
+      required this.title,
+      required this.date,
+      required this.period,
+      this.rating,
+      this.credits});
+
+  bool get isApproved => rating != null;
+
   Map<String, dynamic> toJson() => _$ServiceSnippetToJson(this);
   factory ServiceSnippet.fromJson(Map<String, dynamic> json) =>
       _$ServiceSnippetFromJson(json);
@@ -79,5 +87,6 @@ class ServiceSnippet {
           opportunityId: opportunity.id,
           title: opportunity.title,
           date: opportunity.date,
-          period: opportunity.period);
+          period: opportunity.period,
+          credits: opportunity.credits);
 }

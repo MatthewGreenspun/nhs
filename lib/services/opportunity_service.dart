@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter/material.dart';
 import 'package:nhs/models/index.dart';
@@ -7,6 +8,7 @@ import 'package:nhs/ui/shared/rating/single_rating.dart';
 
 class OpportunityService {
   static final _fbDB = FirebaseFirestore.instance;
+  static final _fbFns = FirebaseFunctions.instance;
   static final _user = FirebaseAuth.instance.currentUser!;
 
   static Future<List<Opportunity>> getOpportunities(
@@ -72,5 +74,12 @@ class OpportunityService {
                 builder: (context) => SingleRating(opportunity: opportunity)));
       }
     });
+  }
+
+  static Future<void> approve(
+      Opportunity opportunity, List<int> ratings, String comments) async {
+    final approval = Approval(
+        opportunity: opportunity, ratings: ratings, comments: comments);
+    await _fbFns.httpsCallable("handleApproval").call(approval.toJson());
   }
 }

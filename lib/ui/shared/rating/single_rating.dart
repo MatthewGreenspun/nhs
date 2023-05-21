@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:flutter_rating_bar/flutter_rating_bar.dart";
 import 'package:intl/intl.dart';
+import 'package:nhs/services/opportunity_service.dart';
 import '../../../models/index.dart';
 
 class SingleRating extends StatefulWidget {
@@ -16,6 +17,7 @@ class _SingleRatingState extends State<SingleRating> {
   double _rating = 5;
   late TextEditingController _commentsController;
   late MemberSnippet _member;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -30,8 +32,15 @@ class _SingleRatingState extends State<SingleRating> {
     super.dispose();
   }
 
-  void handleSubmit() {
-    // TODO: trigger cloud function to update credits
+  Future<void> handleSubmit() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await OpportunityService.approve(
+        widget.opportunity, [_rating.round()], _commentsController.value.text);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -119,10 +128,12 @@ class _SingleRatingState extends State<SingleRating> {
                   ),
                 ),
                 FilledButton(
-                    onPressed: () {
-                      handleSubmit();
-                      Navigator.pop(context);
-                    },
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            handleSubmit()
+                                .then((value) => Navigator.pop(context));
+                          },
                     child: const Text("Submit")),
               ],
             )

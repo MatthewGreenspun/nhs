@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_rating_bar/flutter_rating_bar.dart";
 import "package:intl/intl.dart";
 import "../../../models/index.dart";
+import "../../../services/opportunity_service.dart";
 
 class MultiRating extends StatefulWidget {
   final Opportunity opportunity;
@@ -17,6 +18,7 @@ class _MultiRatingState extends State<MultiRating> {
   late TextEditingController _commentsController;
   final FocusNode _commentsNode = FocusNode();
   final List<MemberSnippet> _members = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -32,6 +34,19 @@ class _MultiRatingState extends State<MultiRating> {
     _commentsController.dispose();
     _commentsNode.dispose();
     super.dispose();
+  }
+
+  Future<void> handleSubmit() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await OpportunityService.approve(
+        widget.opportunity,
+        _ratings.map((r) => r.toInt()).toList(),
+        _commentsController.value.text);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -112,9 +127,12 @@ class _MultiRatingState extends State<MultiRating> {
                   ),
                 ),
                 FilledButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            handleSubmit()
+                                .then((value) => Navigator.pop(context));
+                          },
                     child: const Text("Submit")),
               ],
             )

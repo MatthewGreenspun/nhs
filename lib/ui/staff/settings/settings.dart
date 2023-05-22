@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nhs/services/auth_service.dart';
+import 'package:nhs/ui/shared/settings/appearance.dart';
 import '../../../models/index.dart';
 import '../../shared/settings/settings_container.dart';
 import '../../shared/settings/setting.dart';
@@ -19,6 +20,7 @@ class StaffSettings extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(8),
         child: ListView(children: [
+          const Appearance(),
           SettingsContainer(
             title: "Account",
             child: Column(children: [

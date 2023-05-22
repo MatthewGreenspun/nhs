@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nhs/services/auth_service.dart';
 import 'package:nhs/services/ui_service.dart';
 import 'package:nhs/ui/member/settings/edit_tutoring_subjects.dart';
+import 'package:nhs/ui/shared/settings/appearance.dart';
 import 'package:provider/provider.dart';
 import '../../../models/index.dart';
 import '../../shared/settings/settings_container.dart';
@@ -25,19 +26,7 @@ class MemberSettings extends StatelessWidget {
         builder: (context, uiService, child) => Padding(
             padding: const EdgeInsets.all(8),
             child: ListView(children: [
-              SettingsContainer(
-                  title: "Appearence",
-                  child: Column(
-                    children: [
-                      Setting(
-                        name: "Dark Theme",
-                        child: Switch(
-                          value: uiService.isDarkMode,
-                          onChanged: (value) => uiService.setIsDarkMode(value),
-                        ),
-                      )
-                    ],
-                  )),
+              const Appearance(),
               SettingsContainer(
                 title: "Account",
                 child: Column(children: [

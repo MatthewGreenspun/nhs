@@ -1,4 +1,3 @@
-import "dart:async";
 import "package:flutter/material.dart";
 import "package:nhs/models/index.dart";
 import "package:nhs/services/member_service.dart";

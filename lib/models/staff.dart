@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import './opportunity.dart';
 import "package:json_annotation/json_annotation.dart";
 part "staff.g.dart";

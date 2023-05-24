@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/opportunity_page.dart';
@@ -79,15 +78,6 @@ class MemberHome extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                   context: context,
                   tiles: pastOpportunities.map((serviceSnippet) => ListTile(
-                        leading: !serviceSnippet.isApproved
-                            ? Text(
-                                "+${serviceSnippet.credits}",
-                                style: GoogleFonts.rampartOne(
-                                  fontSize: 30,
-                                  color: Colors.green,
-                                ),
-                              )
-                            : null,
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(

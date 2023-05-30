@@ -39,9 +39,6 @@ class OpportunityService {
         .orderBy("date")
         .limit(limit);
     QuerySnapshot<Map<String, dynamic>> docs;
-    print(filter);
-    print(_querySizeForFilter);
-    print(limit);
     if (filter == "Projects" || filter == "Service" || filter == "Tutoring") {
       docs = await query
           .where("opportunityType", isEqualTo: filter.toLowerCase())

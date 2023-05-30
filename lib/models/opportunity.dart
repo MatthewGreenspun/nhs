@@ -35,7 +35,6 @@ class Opportunity {
   OpportunityType opportunityType;
   double credits;
   int membersNeeded;
-  int numMembersSignedUp;
   List<MemberSnippet> membersSignedUp;
   bool isCompleted;
 
@@ -50,7 +49,6 @@ class Opportunity {
       required this.opportunityType,
       this.credits = 1,
       this.membersNeeded = 1,
-      this.numMembersSignedUp = 0,
       this.membersSignedUp = const [],
       this.isCompleted = false})
       : id = const Uuid().v4();
@@ -58,6 +56,20 @@ class Opportunity {
   factory Opportunity.fromJson(Map<String, dynamic> json) =>
       _$OpportunityFromJson(json);
   Map<String, dynamic> toJson() => _$OpportunityToJson(this);
+
+  @override
+  bool operator ==(dynamic other) {
+    return other.runtimeType == runtimeType &&
+        other.creatorId == creatorId &&
+        other.creatorName == creatorName &&
+        other.department == department &&
+        other.title == title &&
+        other.description == description &&
+        other.date == date;
+  }
+
+  @override
+  int get hashCode => "$creatorId$creatorName$title$description$date".hashCode;
 }
 
 @JsonSerializable()

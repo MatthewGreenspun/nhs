@@ -1,5 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nhs/services/opportunity_service.dart';
+import 'package:nhs/ui/member/opportunities/filter_chips.dart';
+import 'package:nhs/ui/shared/constants.dart';
+import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/opportunity_tile.dart';
 import '../../../models/index.dart';
 
@@ -12,33 +15,34 @@ class Opportunities extends StatefulWidget {
 }
 
 class _OpportunitiesState extends State<Opportunities> {
-  final _chips = [
-    "All",
-    "Projects",
-    "Service",
-    "Tutoring",
-    "Upcoming",
-    "Past",
-  ];
-  final List<GlobalKey> _chipKeys = [];
-  late ScrollController _chipController;
-  int _selectedChip = 0;
-  final List<Opportunity> _opportunities = [];
+  static const _chips = kMemberOpportunityChipFilters;
+  String _selectedChip = _chips.first;
+  bool _isLoadingMore = false;
+  bool _isLoadingNewFilter = true;
+  final OpportunityService _opportunityService = OpportunityService();
+  List<Opportunity> _opportunities = [];
+
+  void _onChipSelected(String chip) {
+    setState(() {
+      _isLoadingNewFilter = true;
+    });
+    _opportunityService.getNextOpportunities(chip).then((initialOpportunities) {
+      setState(() {
+        _selectedChip = chip;
+        _opportunities = initialOpportunities;
+        _isLoadingNewFilter = false;
+      });
+    });
+  }
 
   @override
   void initState() {
-    _chipKeys.addAll(List.generate(
-        _chips.length, (idx) => GlobalKey(debugLabel: _chips[idx])));
-    _chipController = ScrollController();
-    FirebaseFirestore.instance
-        .collection("opportunities")
-        .limit(10)
-        .snapshots()
-        .listen((event) {
+    _opportunityService
+        .getNextOpportunities(_selectedChip)
+        .then((initialOpportunities) {
       setState(() {
-        _opportunities.clear();
-        _opportunities
-            .addAll(event.docs.map((doc) => Opportunity.fromJson(doc.data())));
+        _opportunities = initialOpportunities;
+        _isLoadingNewFilter = false;
       });
     });
     super.initState();
@@ -46,26 +50,7 @@ class _OpportunitiesState extends State<Opportunities> {
 
   @override
   void dispose() {
-    _chipController.dispose();
     super.dispose();
-  }
-
-  double computeChipScrollOffset(int chipIdx) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final maxScroll = _chipController.position.maxScrollExtent;
-    RenderBox box =
-        _chipKeys[chipIdx].currentContext?.findRenderObject() as RenderBox;
-    final itemSize = box.size.width;
-    Offset position = box.localToGlobal(Offset.zero);
-    final desiredPosition = deviceWidth / 2 - itemSize / 2;
-    final change = position.dx - desiredPosition;
-    if (change + _chipController.offset < 0) {
-      return 0;
-    }
-    if (change + _chipController.offset > maxScroll) {
-      return maxScroll;
-    }
-    return change + _chipController.offset;
   }
 
   @override
@@ -78,52 +63,56 @@ class _OpportunitiesState extends State<Opportunities> {
               children: [
                 Flexible(
                     fit: FlexFit.tight,
-                    child: ListView(
-                      controller: _chipController,
-                      scrollDirection: Axis.horizontal,
-                      children: _chips.asMap().entries.map(
-                        (entry) {
-                          final idx = entry.key;
-                          return Container(
-                              key: _chipKeys[idx],
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: ActionChip(
-                                label: Text(entry.value),
-                                backgroundColor: idx == _selectedChip
-                                    ? Theme.of(context).colorScheme.secondary
-                                    : null,
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedChip = idx;
-                                  });
-                                  if (_chipKeys
-                                      .any((e) => e.currentContext == null)) {
-                                    return;
-                                  }
-                                  _chipController.animateTo(
-                                      computeChipScrollOffset(idx),
-                                      curve: Curves.decelerate,
-                                      duration:
-                                          const Duration(milliseconds: 200));
-                                },
-                              ));
-                        },
-                      ).toList(),
-                    )),
-                Expanded(
-                  flex: 10,
-                  child: ListView(
-                      children: ListTile.divideTiles(
+                    child: FilterChips(
+                        labels: _chips, onSelected: _onChipSelected)),
+                if (_isLoadingNewFilter)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                else if (_opportunities.isNotEmpty)
+                  Expanded(
+                    flex: 10,
+                    child: ListView(children: [
+                      ...ListTile.divideTiles(
                           color: Theme.of(context).colorScheme.primary,
                           context: context,
                           tiles: _opportunities
                               .map((opportunity) => OpportunityTile(
                                     opportunity: opportunity,
                                     member: widget.member,
-                                  ))).toList()),
-                )
+                                  ))).toList(),
+                      if (_isLoadingMore)
+                        const Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator())
+                      else
+                        TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _isLoadingMore = true;
+                              });
+                              _opportunityService
+                                  .getNextOpportunities(_selectedChip)
+                                  .then((nextOpportunities) {
+                                setState(() {
+                                  _opportunities = nextOpportunities;
+                                  _isLoadingMore = false;
+                                });
+                              });
+                            },
+                            child: const Text("Load More"))
+                    ]),
+                  )
+                else
+                  const Expanded(
+                      flex: 10,
+                      child: NoResults(
+                          icon: Icon(
+                            Icons.search_off_outlined,
+                            size: 100,
+                          ),
+                          title: "No opportunities",
+                          subtitle: "Check again another time")),
               ],
             )));
   }

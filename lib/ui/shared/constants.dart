@@ -1,4 +1,4 @@
-//TODO: load from firebase
+//TODO: load from firebase remote config
 const kTutoringSubjects = {
   "Math": [
     "Algebra I",
@@ -109,4 +109,11 @@ const kDaysOfTheWeek = [
   "Wednesday",
   "Thursday",
   "Friday"
+];
+
+const kMemberOpportunityChipFilters = [
+  "All",
+  "Projects",
+  "Service",
+  "Tutoring"
 ];

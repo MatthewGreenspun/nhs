@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter/material.dart';
 import 'package:nhs/models/index.dart';
+import 'package:nhs/ui/shared/constants.dart';
 import 'package:nhs/ui/shared/rating/multi_rating.dart';
 import 'package:nhs/ui/shared/rating/single_rating.dart';
 
@@ -11,14 +14,45 @@ class OpportunityService {
   static final _fbFns = FirebaseFunctions.instance;
   static final _user = FirebaseAuth.instance.currentUser!;
 
-  static Future<List<Opportunity>> getOpportunities(
-      {Opportunity? startAfter}) async {
-    const maxResultsPerQuery = 10;
-    final docs = await _fbDB
+  /// This is the multiplier for the number of opportunity documents requested.
+  /// Each time "Load More" is clicked, the entry in _lastQuerySizeForFilter
+  /// corresponding to a particular filter will be incremented by _queryChunkSize
+  static const _queryChunkSize = 2;
+
+  static const _maxQuerySize = 20;
+
+  Map<String, int> _querySizeForFilter = {};
+
+  OpportunityService() {
+    for (String filter in kMemberOpportunityChipFilters) {
+      _querySizeForFilter[filter] = _queryChunkSize;
+    }
+  }
+
+  Future<List<Opportunity>> getNextOpportunities(String filter) async {
+    // Convert to Iso8601String because date is stored as a string in Firebase
+    final today = DateTime.now().toUtc().toIso8601String();
+    final limit = _querySizeForFilter[filter]!;
+    final query = _fbDB
         .collection("opportunities")
-        .startAfter([startAfter])
-        .limit(maxResultsPerQuery)
-        .get();
+        .where("date", isGreaterThanOrEqualTo: today)
+        .orderBy("date")
+        .limit(limit);
+    QuerySnapshot<Map<String, dynamic>> docs;
+    print(filter);
+    print(_querySizeForFilter);
+    print(limit);
+    if (filter == "Projects" || filter == "Service" || filter == "Tutoring") {
+      docs = await query
+          .where("opportunityType", isEqualTo: filter.toLowerCase())
+          .get();
+    } else {
+      // Filter is "All"
+      docs = await query.get();
+    }
+    if (docs.docs.length == limit) {
+      _querySizeForFilter[filter] = min(limit + _queryChunkSize, _maxQuerySize);
+    }
     return docs.docs.map((doc) => Opportunity.fromJson(doc.data())).toList();
   }
 

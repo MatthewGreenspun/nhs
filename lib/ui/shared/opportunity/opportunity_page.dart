@@ -89,7 +89,7 @@ class _OpportunityPageState extends State<OpportunityPage> {
                   Row(
                     children: [
                       attributeContainer(Icons.people_outlined,
-                          "${_opportunity!.numMembersSignedUp} / ${_opportunity!.membersNeeded}"),
+                          "${_opportunity!.membersSignedUp.length} / ${_opportunity!.membersNeeded}"),
                       TextButton(
                         onPressed: () {
                           showModalBottomSheet(
@@ -99,7 +99,7 @@ class _OpportunityPageState extends State<OpportunityPage> {
                               builder: (context) => MembersSignedUp(
                                   members: _opportunity!.membersSignedUp));
                         },
-                        child: _opportunity!.numMembersSignedUp > 0
+                        child: _opportunity!.membersSignedUp.isNotEmpty
                             ? const Text("view")
                             : Container(),
                       ),

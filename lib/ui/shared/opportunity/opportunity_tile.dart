@@ -10,7 +10,8 @@ class OpportunityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFull = opportunity.membersNeeded == opportunity.numMembersSignedUp;
+    final isFull =
+        opportunity.membersNeeded == opportunity.membersSignedUp.length;
     return InkWell(
         onTap: () {
           Navigator.push(
@@ -33,13 +34,13 @@ class OpportunityTile extends StatelessWidget {
               Icon(Icons.people_outline,
                   color: isFull ? Theme.of(context).colorScheme.primary : null),
               Text(
-                "${opportunity.numMembersSignedUp} / ${opportunity.membersNeeded}",
+                "${opportunity.membersSignedUp.length} / ${opportunity.membersNeeded}",
                 style: const TextStyle(fontSize: 10),
               )
             ],
           ),
           enabled:
-              opportunity.membersNeeded != opportunity.numMembersSignedUp &&
+              opportunity.membersNeeded != opportunity.membersSignedUp.length &&
                   opportunity.date.isAfter(DateTime.now()),
         ));
   }

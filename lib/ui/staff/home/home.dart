@@ -27,9 +27,14 @@ class StaffHome extends StatelessWidget {
       );
     }
     final upcomingService = staff!.posts
-        .where((serviceSnippet) => serviceSnippet.date.isAfter(DateTime.now()));
-    final pastService = staff!.posts.where(
-        (serviceSnippet) => serviceSnippet.date.isBefore(DateTime.now()));
+        .where((serviceSnippet) => serviceSnippet.date.isAfter(DateTime.now()))
+        .toList();
+    final pastService = staff!.posts
+        .where((serviceSnippet) => serviceSnippet.date.isBefore(DateTime.now()))
+        .toList();
+    upcomingService.sort((s1, s2) => -s1.date.compareTo(s2.date));
+    pastService.sort((s1, s2) => -s1.date.compareTo(s2.date));
+
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

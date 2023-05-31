@@ -18,9 +18,13 @@ class MemberHome extends StatelessWidget {
       );
     }
     final upcomingOpportunities = member!.opportunities
-        .where((serviceSnippet) => serviceSnippet.date.isAfter(DateTime.now()));
-    final pastOpportunities = member!.opportunities.where(
-        (serviceSnippet) => serviceSnippet.date.isBefore(DateTime.now()));
+        .where((serviceSnippet) => serviceSnippet.date.isAfter(DateTime.now()))
+        .toList();
+    final pastOpportunities = member!.opportunities
+        .where((serviceSnippet) => serviceSnippet.date.isBefore(DateTime.now()))
+        .toList();
+    upcomingOpportunities.sort((o1, o2) => -o1.date.compareTo(o2.date));
+    pastOpportunities.sort((o1, o2) => -o1.date.compareTo(o2.date));
     return Column(
       children: [
         Statistics(member: member!),

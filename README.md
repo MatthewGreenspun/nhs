@@ -1,16 +1,14 @@
-# nhs
+# NHS
 
-A new Flutter project.
+App for National Honor Society.
 
-## Getting Started
+## Running Code
 
-This project is a starting point for a Flutter application.
+The code uses libraries that rely on generated files that are not included in version control. To generate these files, run
 
-A few resources to get you started if this is your first Flutter project:
+```
+dart run build_runner build
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+in the root directory.
+On debug mode, the app uses Firebase Emulators rather than the production database. Download and configure Firebase Emulators using the instructions [here](https://firebase.google.com/docs/emulator-suite).

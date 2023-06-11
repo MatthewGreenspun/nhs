@@ -52,14 +52,13 @@ class NHSApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = AuthService();
-    const primaryColor = Colors.green;
     return Consumer<UIService>(
       builder: (context, uiService, child) => MaterialApp(
         title: 'NHS',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: uiService.colorScheme,
-          appBarTheme: const AppBarTheme(backgroundColor: primaryColor),
+          appBarTheme: AppBarTheme(backgroundColor: uiService.primaryColor),
         ),
         routes: {
           "admin/home": (context) => Scaffold(),

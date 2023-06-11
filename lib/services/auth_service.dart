@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 
 enum UserType { notSignedIn, member, staff, student, admin }
 
@@ -50,6 +50,13 @@ class AuthService {
   }
 
   Future<UserType> signInWithGoogle() async {
+    if (kIsWeb) {
+      GoogleAuthProvider authProvider = GoogleAuthProvider();
+      final UserCredential userCredential =
+          await _fbAuth.signInWithPopup(authProvider);
+      return (await getUserType(userCredential.user));
+    }
+
     final GoogleSignIn googleSignIn =
         GoogleSignIn(hostedDomain: kDebugMode ? null : "bxscience.edu");
 

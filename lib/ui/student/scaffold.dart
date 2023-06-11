@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nhs/services/staff_student_service.dart';
 import 'package:nhs/services/ui_service.dart';
-import 'package:nhs/ui/shared/appbar/appbar.dart';
+import 'package:nhs/ui/shared/misc/appbar.dart';
 import 'package:nhs/ui/student/home/request_tutoring.dart';
 import '../../models/index.dart';
 import "./home/home.dart";

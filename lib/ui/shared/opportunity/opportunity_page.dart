@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nhs/services/opportunity_service.dart';
-import 'package:nhs/ui/shared/appbar/appbar.dart';
+import 'package:nhs/ui/shared/misc/appbar.dart';
 import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/members_signed_up.dart';
 import '../../../models/index.dart';

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import "package:firebase_core/firebase_core.dart";
 import "package:nhs/services/auth_service.dart";
 import "package:nhs/services/ui_service.dart";
+import "package:nhs/ui/admin/account_setup.dart";
+import "package:nhs/ui/admin/scaffold.dart";
 import "package:nhs/ui/shared/auth/pre_sign_in.dart";
 import "package:nhs/ui/student/account_setup/account_setup.dart";
 import "package:nhs/ui/student/scaffold.dart";
@@ -46,7 +48,8 @@ class NHSApp extends StatelessWidget {
     UserType.notSignedIn: SignInScreen(),
     UserType.member: MemberScaffold(),
     UserType.staff: StaffScaffold(),
-    UserType.student: StudentScaffold()
+    UserType.student: StudentScaffold(),
+    UserType.admin: AdminScaffold()
   };
 
   @override
@@ -61,8 +64,8 @@ class NHSApp extends StatelessWidget {
           appBarTheme: AppBarTheme(backgroundColor: uiService.primaryColor),
         ),
         routes: {
-          "admin/home": (context) => Scaffold(),
-          "admin/account-setup": (context) => Scaffold(),
+          "admin/home": (context) => const AdminScaffold(),
+          "admin/account-setup": (context) => const AdminAccountSetup(),
           "member/home": (context) => const MemberScaffold(),
           "member/account-setup": (context) => const MemberAccountSetup(),
           "staff/home": (context) => const StaffScaffold(),

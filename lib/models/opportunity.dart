@@ -22,6 +22,25 @@ class MemberSnippet {
   Map<String, dynamic> toJson() => _$MemberSnippetToJson(this);
 }
 
+@JsonSerializable()
+class Role {
+  String name;
+  int membersNeeded;
+  List<MemberSnippet> membersSignedUp;
+  Role(
+      {required this.name,
+      required this.membersNeeded,
+      this.membersSignedUp = const []});
+
+  @override
+  String toString() {
+    return "$name : $membersNeeded";
+  }
+
+  factory Role.fromJson(Map<String, dynamic> json) => _$RoleFromJson(json);
+  Map<String, dynamic> toJson() => _$RoleToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class Opportunity {
   String id;
@@ -37,6 +56,8 @@ class Opportunity {
   int membersNeeded;
   List<MemberSnippet> membersSignedUp;
   bool isCompleted;
+  List<Role>? roles;
+  bool? allowMultipleRoles;
 
   Opportunity(
       {required this.creatorId,
@@ -50,7 +71,9 @@ class Opportunity {
       this.credits = 1,
       this.membersNeeded = 1,
       this.membersSignedUp = const [],
-      this.isCompleted = false})
+      this.isCompleted = false,
+      this.roles,
+      this.allowMultipleRoles})
       : id = const Uuid().v4();
 
   factory Opportunity.fromJson(Map<String, dynamic> json) =>

@@ -7,3 +7,11 @@ List<T> flatten<T>(List<List<T>> list) {
   }
   return newList;
 }
+
+List<R> idxMap<T, R>(List<T> list, R Function(T, int) fn) {
+  List<R> newList = [];
+  for (int i = 0; i < list.length; i++) {
+    newList.add(fn(list[i], i));
+  }
+  return newList;
+}

@@ -24,7 +24,7 @@ class MembersSignedUp extends StatelessWidget {
                 backgroundImage: NetworkImage(member.profilePicture),
               ),
               title: Text(member.name),
-              subtitle: Text(member.email),
+              subtitle: Text(member.role ?? member.email),
             );
           }).toList(),
         ))

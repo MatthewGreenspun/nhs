@@ -1,3 +1,4 @@
+import "package:firebase_auth/firebase_auth.dart";
 import "package:json_annotation/json_annotation.dart";
 import "package:uuid/uuid.dart";
 part "opportunity.g.dart";
@@ -10,19 +11,52 @@ class MemberSnippet {
   String name;
   String email;
   String profilePicture;
+  String? role;
 
   MemberSnippet(
       {required this.id,
       required this.name,
       required this.email,
-      required this.profilePicture});
+      required this.profilePicture,
+      this.role});
+
+  MemberSnippet copyWith(
+      {String? id,
+      String? name,
+      String? email,
+      String? profilePicture,
+      String? role}) {
+    return MemberSnippet(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        email: email ?? this.email,
+        profilePicture: profilePicture ?? this.profilePicture,
+        role: role ?? this.role);
+  }
+
+  bool get isMe => FirebaseAuth.instance.currentUser!.email == email;
+
+  @override
+  bool operator ==(dynamic other) {
+    return other.runtimeType == runtimeType &&
+        other.id == id &&
+        other.name == name &&
+        other.email == email &&
+        other.profilePicture == profilePicture;
+  }
+
+  @override
+  int get hashCode => "$id $name $email".hashCode;
+
+  @override
+  String toString() => "$id $name $email";
 
   factory MemberSnippet.fromJson(Map<String, dynamic> json) =>
       _$MemberSnippetFromJson(json);
   Map<String, dynamic> toJson() => _$MemberSnippetToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Role {
   String name;
   int membersNeeded;
@@ -32,10 +66,22 @@ class Role {
       required this.membersNeeded,
       this.membersSignedUp = const []});
 
+  bool get isFull => membersNeeded == membersSignedUp.length;
+
   @override
   String toString() {
     return "$name : $membersNeeded";
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    return other.runtimeType == runtimeType &&
+        other.name == name &&
+        other.membersNeeded == membersNeeded;
+  }
+
+  @override
+  int get hashCode => "$name $membersNeeded".hashCode;
 
   factory Role.fromJson(Map<String, dynamic> json) => _$RoleFromJson(json);
   Map<String, dynamic> toJson() => _$RoleToJson(this);
@@ -53,8 +99,8 @@ class Opportunity {
   int period;
   OpportunityType opportunityType;
   double credits;
-  int membersNeeded;
-  List<MemberSnippet> membersSignedUp;
+  int _membersNeeded;
+  List<MemberSnippet> _membersSignedUp;
   bool isCompleted;
   List<Role>? roles;
   bool? allowMultipleRoles;
@@ -69,16 +115,34 @@ class Opportunity {
       this.period = 1,
       required this.opportunityType,
       this.credits = 1,
-      this.membersNeeded = 1,
-      this.membersSignedUp = const [],
+      int membersNeeded = 1,
+      List<MemberSnippet> membersSignedUp = const [],
       this.isCompleted = false,
       this.roles,
       this.allowMultipleRoles})
-      : id = const Uuid().v4();
+      : id = const Uuid().v4(),
+        _membersNeeded = membersNeeded,
+        _membersSignedUp = membersSignedUp;
 
   factory Opportunity.fromJson(Map<String, dynamic> json) =>
       _$OpportunityFromJson(json);
   Map<String, dynamic> toJson() => _$OpportunityToJson(this);
+
+  int get membersNeeded {
+    if (roles == null) return _membersNeeded;
+    return roles!
+        .fold(0, (previousValue, role) => previousValue + role.membersNeeded);
+  }
+
+  List<MemberSnippet> get membersSignedUp {
+    if (roles == null) return _membersSignedUp;
+    return roles!.fold(
+        [],
+        (previousValue, role) => [
+              ...previousValue,
+              ...role.membersSignedUp.map((m) => m.copyWith(role: role.name))
+            ]);
+  }
 
   @override
   bool operator ==(dynamic other) {

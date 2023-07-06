@@ -111,9 +111,4 @@ const kDaysOfTheWeek = [
   "Friday"
 ];
 
-const kMemberOpportunityChipFilters = [
-  "All",
-  "Projects",
-  "Service",
-  "Tutoring"
-];
+const kMemberOpportunityChipFilters = ["All", "Project", "Service", "Tutoring"];

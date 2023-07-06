@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nhs/services/opportunity_service.dart';
@@ -7,6 +6,7 @@ import 'package:nhs/ui/shared/misc/appbar.dart';
 import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/members_signed_up.dart';
 import '../../../models/index.dart';
+import 'role_selection.dart';
 
 class OpportunityPage extends StatefulWidget {
   final String id;
@@ -19,25 +19,18 @@ class OpportunityPage extends StatefulWidget {
 
 class _OpportunityPageState extends State<OpportunityPage> {
   Opportunity? _opportunity;
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _sub;
+  StreamSubscription<Opportunity>? _sub;
   bool _isSignedUp = false;
 
   @override
   void initState() {
-    setState(() {
-      _isSignedUp = widget.member != null &&
-          widget.member!.opportunities
-              .any((snippet) => snippet.opportunityId == widget.id);
-    });
-    final stream = FirebaseFirestore.instance
-        .collection("opportunities")
-        .doc(widget.id)
-        .snapshots();
-    _sub = stream.listen((event) {
+    _sub = OpportunityService.stream(widget.id).listen((event) {
       setState(() {
-        _opportunity = Opportunity.fromJson(event.data()!);
+        _opportunity = event;
+        _isSignedUp = _opportunity!.membersSignedUp.any((m) => m.isMe);
       });
     });
+
     super.initState();
   }
 
@@ -47,14 +40,19 @@ class _OpportunityPageState extends State<OpportunityPage> {
     super.dispose();
   }
 
+  void _showRoleSelection() {
+    showModalBottomSheet(
+        context: context,
+        enableDrag: true,
+        isDismissible: true,
+        useSafeArea: true,
+        builder: (context) => RoleSelection(initialValue: _opportunity!));
+  }
+
   Widget attributeContainer(IconData icon, String text) {
-    return Row(
-      children: [
-        Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            child: Icon(icon)),
-        Text(text)
-      ],
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(text),
     );
   }
 
@@ -84,49 +82,63 @@ class _OpportunityPageState extends State<OpportunityPage> {
                       Icons.school_outlined, _opportunity!.creatorName),
                   attributeContainer(
                     Icons.calendar_month_outlined,
-                    "${DateFormat.MMMMEEEEd().format(_opportunity!.date)}, Period ${_opportunity!.period}",
+                    DateFormat.MMMMEEEEd().format(_opportunity!.date),
                   ),
-                  Row(
-                    children: [
-                      attributeContainer(Icons.people_outlined,
-                          "${_opportunity!.membersSignedUp.length} / ${_opportunity!.membersNeeded}"),
-                      TextButton(
+                  if (_opportunity!.roles == null)
+                    attributeContainer(
+                        Icons.timer_outlined, "Period ${_opportunity!.period}"),
+                  ListTile(
+                      leading: const Icon(Icons.people_outlined),
+                      title: Row(
+                        children: [
+                          Text(
+                              "${_opportunity!.membersSignedUp.length} / ${_opportunity!.membersNeeded}"),
+                          if (_opportunity!.membersSignedUp.isNotEmpty)
+                            TextButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      enableDrag: true,
+                                      isDismissible: true,
+                                      builder: (context) => MembersSignedUp(
+                                          members:
+                                              _opportunity!.membersSignedUp));
+                                },
+                                child: const Text("view"))
+                        ],
+                      )),
+                  if (widget.member != null && _isSignedUp)
+                    ElevatedButton(
                         onPressed: () {
-                          showModalBottomSheet(
-                              context: context,
-                              enableDrag: true,
-                              isDismissible: true,
-                              builder: (context) => MembersSignedUp(
-                                  members: _opportunity!.membersSignedUp));
+                          if (_opportunity!.roles == null) {
+                            OpportunityService.cancelRegistration(
+                                _opportunity!);
+                          } else {
+                            _showRoleSelection();
+                          }
                         },
-                        child: _opportunity!.membersSignedUp.isNotEmpty
-                            ? const Text("view")
-                            : Container(),
-                      ),
-                    ],
-                  ),
-                  widget.member != null
-                      ? _isSignedUp
-                          ? ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isSignedUp = false;
-                                });
-                                OpportunityService.cancelRegistration(
-                                    _opportunity!);
-                              },
-                              child: const Text("Cancel Registration"))
-                          : FilledButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isSignedUp = true;
-                                });
-                                OpportunityService.signUp(_opportunity!);
-                              },
-                              child: const Text("Sign Up"))
-                      : Container(),
+                        child: Text(_opportunity!.roles == null
+                            ? "Cancel Registration"
+                            : "Change Role"))
+                  else if (!_isSignedUp)
+                    FilledButton(
+                        onPressed: () {
+                          if (_opportunity!.roles != null) {
+                            _showRoleSelection();
+                          } else {
+                            OpportunityService.signUp(_opportunity!);
+                          }
+                        },
+                        child: const Text("Sign Up")),
                   Divider(color: Theme.of(context).colorScheme.primary),
-                  Text(_opportunity!.description),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Text(_opportunity!.description,
+                            style: Theme.of(context).textTheme.bodyLarge),
+                      ],
+                    ),
+                  )
                 ])));
   }
 }

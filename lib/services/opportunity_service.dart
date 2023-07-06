@@ -39,7 +39,7 @@ class OpportunityService {
         .orderBy("date")
         .limit(limit);
     QuerySnapshot<Map<String, dynamic>> docs;
-    if (filter == "Projects" || filter == "Service" || filter == "Tutoring") {
+    if (filter == "Project" || filter == "Service" || filter == "Tutoring") {
       docs = await query
           .where("opportunityType", isEqualTo: filter.toLowerCase())
           .get();
@@ -53,17 +53,25 @@ class OpportunityService {
     return docs.docs.map((doc) => Opportunity.fromJson(doc.data())).toList();
   }
 
+  static Stream<Opportunity> stream(String opportunityId) {
+    return _fbDB
+        .collection("opportunities")
+        .doc(opportunityId)
+        .snapshots()
+        .map((event) => Opportunity.fromJson(event.data()!));
+  }
+
+  static MemberSnippet get _memberSnippet => MemberSnippet(
+      email: _user.email!,
+      id: _user.uid,
+      name: _user.displayName!,
+      profilePicture: _user.photoURL!);
+
   static Future<void> signUp(Opportunity opportunity) async {
-    final memberSnippet = MemberSnippet(
-        email: _user.email!,
-        id: _user.uid,
-        name: _user.displayName!,
-        profilePicture: _user.photoURL!);
     final serviceSnippet = ServiceSnippet.fromOpportunity(opportunity);
     await Future.wait([
       _fbDB.collection("opportunities").doc(opportunity.id).set({
-        "numMembersSignedUp": FieldValue.increment(1),
-        "membersSignedUp": FieldValue.arrayUnion([memberSnippet.toJson()])
+        "membersSignedUp": FieldValue.arrayUnion([_memberSnippet.toJson()])
       }, SetOptions(merge: true)),
       _fbDB.collection("users").doc(_user.uid).set({
         "opportunities": FieldValue.arrayUnion([serviceSnippet.toJson()])
@@ -72,16 +80,10 @@ class OpportunityService {
   }
 
   static Future<void> cancelRegistration(Opportunity opportunity) async {
-    final memberSnippet = MemberSnippet(
-        email: _user.email!,
-        id: _user.uid,
-        name: _user.displayName!,
-        profilePicture: _user.photoURL!);
     final serviceSnippet = ServiceSnippet.fromOpportunity(opportunity);
     await Future.wait([
       _fbDB.collection("opportunities").doc(opportunity.id).set({
-        "numMembersSignedUp": FieldValue.increment(-1),
-        "membersSignedUp": FieldValue.arrayRemove([memberSnippet.toJson()])
+        "membersSignedUp": FieldValue.arrayRemove([_memberSnippet.toJson()])
       }, SetOptions(merge: true)),
       _fbDB.collection("users").doc(_user.uid).set({
         "opportunities": FieldValue.arrayRemove([serviceSnippet.toJson()])
@@ -105,6 +107,52 @@ class OpportunityService {
                 builder: (context) => SingleRating(opportunity: opportunity)));
       }
     });
+  }
+
+  static Future<void> signUpForRole(Opportunity opportunity, Role role) async {
+    final serviceSnippet = ServiceSnippet.fromOpportunity(opportunity);
+    final newRoles = opportunity.roles!.map((r) {
+      if (r != role) {
+        return r.toJson();
+      }
+      return Role(
+          name: role.name,
+          membersNeeded: role.membersNeeded,
+          membersSignedUp: [_memberSnippet, ...role.membersSignedUp]).toJson();
+    });
+    await Future.wait([
+      _fbDB
+          .collection("opportunities")
+          .doc(opportunity.id)
+          .set({"roles": newRoles.toList()}, SetOptions(merge: true)),
+      _fbDB.collection("users").doc(_user.uid).set({
+        "opportunities": FieldValue.arrayUnion([serviceSnippet.toJson()])
+      }, SetOptions(merge: true))
+    ]);
+  }
+
+  static Future<void> cancelRegistrationForRole(
+      Opportunity opportunity, List<Role> roles) async {
+    final serviceSnippet = ServiceSnippet.fromOpportunity(opportunity);
+    final newRoles = opportunity.roles!.map((r) {
+      if (!roles.contains(r)) {
+        return r.toJson();
+      }
+      return Role(
+              name: r.name,
+              membersNeeded: r.membersNeeded,
+              membersSignedUp: r.membersSignedUp.where((m) => !m.isMe).toList())
+          .toJson();
+    });
+    await Future.wait([
+      _fbDB
+          .collection("opportunities")
+          .doc(opportunity.id)
+          .set({"roles": newRoles.toList()}, SetOptions(merge: true)),
+      _fbDB.collection("users").doc(_user.uid).set({
+        "opportunities": FieldValue.arrayRemove([serviceSnippet.toJson()])
+      }, SetOptions(merge: true))
+    ]);
   }
 
   static Future<void> approve(

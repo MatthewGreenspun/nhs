@@ -120,7 +120,7 @@ class _OpportunityPageState extends State<OpportunityPage> {
                         child: Text(_opportunity!.roles == null
                             ? "Cancel Registration"
                             : "Change Role"))
-                  else if (!_isSignedUp)
+                  else if (widget.member != null && !_isSignedUp)
                     FilledButton(
                         onPressed: () {
                           if (_opportunity!.roles != null) {

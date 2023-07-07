@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/member/home/opportunity_tabs.dart';
 import '../../../models/index.dart';
-import "./statistics.dart";
+import '../../shared/misc/statistics.dart';
 
 class MemberHome extends StatefulWidget {
   final Member? member;

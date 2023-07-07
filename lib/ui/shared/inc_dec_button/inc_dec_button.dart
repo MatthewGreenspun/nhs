@@ -68,6 +68,7 @@ class _IncDecButtonState extends State<IncDecButton> {
   Widget build(BuildContext context) {
     const duration = Duration(milliseconds: 100);
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
             onTap: () {

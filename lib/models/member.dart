@@ -5,6 +5,8 @@ part "member.g.dart";
 @JsonSerializable()
 class Member {
   String role = "member";
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? id;
   String name;
   String email;
   int graduationYear;
@@ -27,6 +29,8 @@ class Member {
       this.tutoringSubjects = const [],
       this.freePeriods = const {},
       this.opportunities = const []});
+
+  void setId(String id) => this.id = id;
 
   factory Member.fromJson(Map<String, dynamic> json) => _$MemberFromJson(json);
   Map<String, dynamic> toJson() => _$MemberToJson(this);

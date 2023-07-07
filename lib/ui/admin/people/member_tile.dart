@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nhs/ui/member/home/statistics.dart';
-import 'package:nhs/ui/shared/misc/alert.dart';
+import 'package:nhs/ui/shared/misc/statistics.dart';
 import 'package:nhs/ui/shared/misc/appbar.dart';
 import '../../../models/index.dart';
 
@@ -21,8 +20,10 @@ class MemberTile extends StatelessWidget {
                     appBar: const NHSAppBar(),
                     body: Column(
                       children: [
-                        Statistics(member: member),
-                        Alert.error("No credits")
+                        Statistics(
+                          member: member,
+                          canEdit: true,
+                        ),
                       ],
                     ))),
           );

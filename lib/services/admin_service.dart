@@ -26,7 +26,9 @@ class AdminService {
         .collection("users")
         .where("role", isEqualTo: "member")
         .get();
-    return docs.docs.map((doc) => Member.fromJson(doc.data())).toList();
+    return docs.docs
+        .map((doc) => Member.fromJson(doc.data())..setId(doc.id))
+        .toList();
   }
 
   static Future<void> createProject(FormBuilderFields fields) async {
@@ -53,5 +55,16 @@ class AdminService {
         )
       }, SetOptions(merge: true));
     });
+  }
+
+  static Future<void> editMember(String memberId,
+      {required double project,
+      required double service,
+      required double tutoring}) {
+    return _fbDB.collection("users").doc(memberId).set({
+      "projectCredits": project,
+      "serviceCredits": service,
+      "tutoringCredits": tutoring,
+    }, SetOptions(merge: true));
   }
 }

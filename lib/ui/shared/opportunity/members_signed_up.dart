@@ -3,7 +3,9 @@ import "../../../models/index.dart";
 
 class MembersSignedUp extends StatelessWidget {
   final List<MemberSnippet> members;
-  const MembersSignedUp({super.key, required this.members});
+  final bool canEdit;
+  const MembersSignedUp(
+      {super.key, required this.members, this.canEdit = false});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,10 @@ class MembersSignedUp extends StatelessWidget {
               ),
               title: Text(member.name),
               subtitle: Text(member.role ?? member.email),
+              trailing: canEdit
+                  ? IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.more_vert))
+                  : null,
             );
           }).toList(),
         ))

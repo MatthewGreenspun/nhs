@@ -11,7 +11,16 @@ import 'role_selection.dart';
 class OpportunityPage extends StatefulWidget {
   final String id;
   final Member? member;
-  const OpportunityPage({super.key, required this.id, this.member});
+  final Staff? staff;
+  final Student? student;
+  final Admin? admin;
+  const OpportunityPage(
+      {super.key,
+      required this.id,
+      this.member,
+      this.staff,
+      this.student,
+      this.admin});
 
   @override
   State<OpportunityPage> createState() => _OpportunityPageState();
@@ -71,9 +80,19 @@ class _OpportunityPageState extends State<OpportunityPage> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    _opportunity!.title,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _opportunity!.title,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      if ((widget.staff ?? widget.student ?? widget.admin) !=
+                          null)
+                        IconButton.outlined(
+                            onPressed: () {},
+                            icon: const Icon(Icons.edit_outlined))
+                    ],
                   ),
                   Divider(
                     color: Theme.of(context).colorScheme.primary,
@@ -102,7 +121,11 @@ class _OpportunityPageState extends State<OpportunityPage> {
                                       isDismissible: true,
                                       builder: (context) => MembersSignedUp(
                                           members:
-                                              _opportunity!.membersSignedUp));
+                                              _opportunity!.membersSignedUp,
+                                          canEdit: (widget.staff ??
+                                                  widget.student ??
+                                                  widget.admin) !=
+                                              null));
                                 },
                                 child: const Text("view"))
                         ],

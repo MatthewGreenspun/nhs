@@ -41,10 +41,9 @@ class _RoleSelectionState extends State<RoleSelection> {
         children: [
           Text(
             "Roles",
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
-          const Divider(),
           Expanded(
               child: ListView(
             children: _opportunity!.roles!.map((role) {

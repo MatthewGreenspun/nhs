@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nhs/ui/member/home/opportunity_tabs.dart';
 import 'package:nhs/ui/shared/misc/statistics.dart';
 import 'package:nhs/ui/shared/misc/appbar.dart';
 import '../../../models/index.dart';
@@ -24,6 +25,9 @@ class MemberTile extends StatelessWidget {
                           member: member,
                           canEdit: true,
                         ),
+                        Expanded(
+                            child: OpportunityTabs(
+                                opportunities: member.opportunities))
                       ],
                     ))),
           );

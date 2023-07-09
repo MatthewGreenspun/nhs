@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nhs/services/opportunity_service.dart';
-import 'package:nhs/ui/member/opportunities/filter_chips.dart';
+import 'package:nhs/ui/shared/opportunity/filter_chips.dart';
 import 'package:nhs/ui/shared/constants.dart';
 import 'package:nhs/ui/shared/misc/no_results.dart';
 import 'package:nhs/ui/shared/opportunity/opportunity_tile.dart';
@@ -8,35 +8,29 @@ import '../../../models/index.dart';
 
 class Opportunities extends StatefulWidget {
   final Member? member;
-  const Opportunities({super.key, required this.member});
+  final Admin? admin;
+  const Opportunities({super.key, this.member, this.admin});
 
   @override
   State<Opportunities> createState() => _OpportunitiesState();
 }
 
 class _OpportunitiesState extends State<Opportunities> {
-  static const _chips = kMemberOpportunityChipFilters;
-  String _selectedChip = _chips.first;
+  List<String> _chips = [];
+  late String _selectedChip;
   bool _isLoadingMore = false;
   bool _isLoadingNewFilter = true;
   final OpportunityService _opportunityService = OpportunityService();
   List<Opportunity> _opportunities = [];
 
-  void _onChipSelected(String chip) {
-    setState(() {
-      _isLoadingNewFilter = true;
-    });
-    _opportunityService.getNextOpportunities(chip).then((initialOpportunities) {
-      setState(() {
-        _selectedChip = chip;
-        _opportunities = initialOpportunities;
-        _isLoadingNewFilter = false;
-      });
-    });
-  }
-
   @override
   void initState() {
+    if (widget.admin != null) {
+      _chips = kAdminOpportunityChipFilters;
+    } else {
+      _chips = kMemberOpportunityChipFilters;
+    }
+    _selectedChip = _chips.first;
     _opportunityService
         .getNextOpportunities(_selectedChip)
         .then((initialOpportunities) {
@@ -51,6 +45,19 @@ class _OpportunitiesState extends State<Opportunities> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onChipSelected(String chip) {
+    setState(() {
+      _isLoadingNewFilter = true;
+    });
+    _opportunityService.getNextOpportunities(chip).then((initialOpportunities) {
+      setState(() {
+        _selectedChip = chip;
+        _opportunities = initialOpportunities;
+        _isLoadingNewFilter = false;
+      });
+    });
   }
 
   @override
@@ -80,6 +87,7 @@ class _OpportunitiesState extends State<Opportunities> {
                               .map((opportunity) => OpportunityTile(
                                     opportunity: opportunity,
                                     member: widget.member,
+                                    admin: widget.admin,
                                   ))).toList(),
                       if (_isLoadingMore)
                         const Align(

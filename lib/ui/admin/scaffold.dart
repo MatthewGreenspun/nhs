@@ -6,6 +6,7 @@ import 'package:nhs/ui/admin/home/home.dart';
 import 'package:nhs/ui/admin/people/people.dart';
 import 'package:nhs/ui/admin/settings/settings.dart';
 import 'package:nhs/ui/shared/misc/appbar.dart';
+import 'package:nhs/ui/shared/opportunity/opportunities.dart';
 import 'package:nhs/utils/ui.dart';
 import '../../models/admin.dart';
 
@@ -43,6 +44,10 @@ class _AdminScaffoldState extends State<AdminScaffold> {
       page = AdminHome(admin: admin!);
     } else if (_currentIndex == 1) {
       page = const People();
+    } else if (_currentIndex == 2) {
+      page = Opportunities(
+        admin: admin,
+      );
     } else if (_currentIndex == 3) {
       page = AdminSettings(admin: admin);
     }
@@ -76,11 +81,6 @@ class _AdminScaffoldState extends State<AdminScaffold> {
           ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // showBottomSheetDialogue(
-          //     context: context,
-          //     children: [],
-          //     actionButton:
-          //         TextButton(onPressed: () {}, child: const Text("Save")));
           showModalBottomSheet(
               context: context,
               builder: (context) => Container(

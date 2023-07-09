@@ -3,7 +3,7 @@ import "package:nhs/models/index.dart";
 import "package:nhs/services/member_service.dart";
 import "package:nhs/services/ui_service.dart";
 import "package:nhs/ui/member/home/home.dart";
-import "./opportunities/opportunities.dart";
+import '../shared/opportunity/opportunities.dart';
 import '../shared/misc/appbar.dart';
 import "./settings/settings.dart";
 

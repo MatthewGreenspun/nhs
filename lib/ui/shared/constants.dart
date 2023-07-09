@@ -112,3 +112,11 @@ const kDaysOfTheWeek = [
 ];
 
 const kMemberOpportunityChipFilters = ["All", "Project", "Service", "Tutoring"];
+
+const kAdminOpportunityChipFilters = [
+  "All",
+  "Project",
+  "Service",
+  "Tutoring",
+  "Past"
+];

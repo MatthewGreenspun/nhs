@@ -6,7 +6,9 @@ import './opportunity_page.dart';
 class OpportunityTile extends StatelessWidget {
   final Opportunity opportunity;
   final Member? member;
-  const OpportunityTile({super.key, required this.opportunity, this.member});
+  final Admin? admin;
+  const OpportunityTile(
+      {super.key, required this.opportunity, this.member, this.admin});
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +22,12 @@ class OpportunityTile extends StatelessWidget {
                   builder: (context) => OpportunityPage(
                         id: opportunity.id,
                         member: member,
+                        admin: admin,
                       )));
         },
         child: ListTile(
           title: Text(opportunity.title),
-          leading:
-              const CircleAvatar(child: Icon(Icons.workspace_premium_outlined)),
+          leading: CircleAvatar(child: Icon(opportunity.icon)),
           subtitle: Text(
             DateFormat.MMMMEEEEd().format(opportunity.date),
           ),

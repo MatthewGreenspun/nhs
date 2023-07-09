@@ -1,4 +1,5 @@
 import "package:firebase_auth/firebase_auth.dart";
+import "package:flutter/material.dart";
 import "package:json_annotation/json_annotation.dart";
 import "package:uuid/uuid.dart";
 part "opportunity.g.dart";
@@ -142,6 +143,17 @@ class Opportunity {
               ...previousValue,
               ...role.membersSignedUp.map((m) => m.copyWith(role: role.name))
             ]);
+  }
+
+  IconData get icon {
+    switch (opportunityType) {
+      case OpportunityType.project:
+        return Icons.workspace_premium_outlined;
+      case OpportunityType.service:
+        return Icons.room_service_outlined;
+      case OpportunityType.tutoring:
+        return Icons.school_outlined;
+    }
   }
 
   @override

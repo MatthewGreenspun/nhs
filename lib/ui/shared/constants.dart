@@ -120,3 +120,5 @@ const kAdminOpportunityChipFilters = [
   "Tutoring",
   "Past"
 ];
+
+const kCreditsNeeded = 15;

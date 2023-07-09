@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nhs/ui/member/home/opportunity_tabs.dart';
+import 'package:nhs/ui/shared/constants.dart';
 import 'package:nhs/ui/shared/misc/statistics.dart';
 import 'package:nhs/ui/shared/misc/appbar.dart';
 import '../../../models/index.dart';
@@ -36,7 +37,7 @@ class MemberTile extends StatelessWidget {
           leading: CircleAvatar(
             backgroundColor: credits == 0
                 ? Colors.red
-                : credits >= 15
+                : credits >= kCreditsNeeded
                     ? Colors.green
                     : Colors.orange,
             child: Text("$credits"),
